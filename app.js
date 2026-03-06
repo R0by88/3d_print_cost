@@ -1,13 +1,19 @@
 let printers = JSON.parse(localStorage.getItem("printers")) || [];
+let filaments = JSON.parse(localStorage.getItem("filaments")) || [];
 let history = JSON.parse(localStorage.getItem("history")) || [];
 
 function savePrinters(){
 localStorage.setItem("printers",JSON.stringify(printers));
 }
 
+function saveFilaments(){
+localStorage.setItem("filaments",JSON.stringify(filaments));
+}
+
 function saveHistory(){
 localStorage.setItem("history",JSON.stringify(history));
 }
+
 
 
 function newPrintPage(){
@@ -39,8 +45,7 @@ html+=`</div>`;
 
 html+=`<div class="card">`;
 
-html+=`<label>Materiale (grammi)</label>`;
-
+html+=`<label>Materiale usato (grammi)</label>`;
 html+=`<input id="grams" type="number">`;
 
 html+=`</div>`;
@@ -52,8 +57,8 @@ html+=`<label>Tempo stampa</label>`;
 
 html+=`<div class="timeRow">`;
 
-html+=`<div>Ore<br><input id="hours" type="number"></div>`;
-html+=`<div>Minuti<br><input id="minutes" type="number"></div>`;
+html+=`<div><label>Ore</label><input id="hours" type="number"></div>`;
+html+=`<div><label>Min</label><input id="minutes" type="number"></div>`;
 
 html+=`</div>`;
 
@@ -62,15 +67,13 @@ html+=`</div>`;
 
 html+=`<div class="card">`;
 
-html+=`<label>Costo materiali extra €</label>`;
-
+html+=`<label>Costo extra €</label>`;
 html+=`<input id="extraCost" type="number" step="0.01">`;
 
 html+=`</div>`;
 
 
 html+=`<button onclick="savePrint()">Salva stampa</button>`;
-
 
 document.getElementById("app").innerHTML=html;
 
@@ -157,7 +160,7 @@ html+=`<label>Modello</label>`;
 html+=`<input id="model">`;
 
 html+=`<label>Consumo kWh</label>`;
-html+=`<input id="consumption" type="number" step="0.01">`;
+html+=`<input id="consumption" type="number">`;
 
 html+=`<button onclick="addPrinter()">Aggiungi stampante</button>`;
 
@@ -174,7 +177,6 @@ html+=`Consumo: ${p.consumption} kWh`;
 html+=`</div>`;
 
 });
-
 
 document.getElementById("app").innerHTML=html;
 
@@ -195,5 +197,65 @@ printers.push({brand,model,consumption});
 savePrinters();
 
 printersPage();
+
+}
+
+
+
+function filamentsPage(){
+
+let html="";
+
+html+=`<div class="card">`;
+
+html+=`<label>Marca</label>`;
+html+=`<input id="fbrand">`;
+
+html+=`<label>Tipo</label>`;
+html+=`<input id="ftype">`;
+
+html+=`<label>Colore</label>`;
+html+=`<input id="fcolor">`;
+
+html+=`<label>Prezzo €/kg</label>`;
+html+=`<input id="fprice" type="number" step="0.01">`;
+
+html+=`<button onclick="addFilament()">Aggiungi filamento</button>`;
+
+html+=`</div>`;
+
+
+filaments.forEach(f=>{
+
+html+=`<div class="card">`;
+
+html+=`${f.brand} - ${f.type} - ${f.color}<br>`;
+html+=`€ ${f.price}/kg`;
+
+html+=`</div>`;
+
+});
+
+document.getElementById("app").innerHTML=html;
+
+}
+
+
+
+function addFilament(){
+
+let brand=document.getElementById("fbrand").value;
+
+let type=document.getElementById("ftype").value;
+
+let color=document.getElementById("fcolor").value;
+
+let price=parseFloat(document.getElementById("fprice").value);
+
+filaments.push({brand,type,color,price});
+
+saveFilaments();
+
+filamentsPage();
 
 }
