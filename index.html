@@ -1,26 +1,47 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>3D Print Cost</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
+<div class="app">
+
+<header>
 <h1>3D Print Cost</h1>
+</header>
 
-<div id="menu">
+<div class="menu">
 
-<button onclick="showPage('new')">Nuova stampa</button>
-<button onclick="showPage('history')">Storico</button>
-<button onclick="showPage('filaments')">Database filamenti</button>
-<button onclick="showPage('printers')">Database stampanti</button>
+<button onclick="showPage('new')" class="cardBtn">
+🖨️ Nuova stampa
+</button>
+
+<button onclick="showPage('history')" class="cardBtn">
+📊 Storico
+</button>
+
+<button onclick="showPage('filaments')" class="cardBtn">
+🧵 Filamenti
+</button>
+
+<button onclick="showPage('printers')" class="cardBtn">
+⚙️ Stampanti
+</button>
 
 </div>
 
 <div id="content"></div>
+
+</div>
 
 <script src="app.js"></script>
 
