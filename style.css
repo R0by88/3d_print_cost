@@ -1,5 +1,5 @@
 body{
-font-family: Arial, Helvetica, sans-serif;
+font-family:Arial, Helvetica, sans-serif;
 background:#f4f6f8;
 margin:0;
 padding:0;
@@ -16,28 +16,44 @@ text-align:center;
 margin-bottom:20px;
 }
 
-button{
+.menu button{
 width:100%;
 padding:12px;
-margin-top:10px;
+margin-bottom:10px;
 border:none;
-border-radius:8px;
+border-radius:10px;
 background:#2c7be5;
 color:white;
 font-size:16px;
 cursor:pointer;
 }
 
-button:hover{
+.menu button:hover{
 background:#1a68d1;
 }
 
 .card{
 background:white;
 padding:15px;
-border-radius:10px;
+border-radius:12px;
 margin-bottom:15px;
 box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+label{
+font-size:14px;
+font-weight:bold;
+display:block;
+margin-bottom:5px;
+}
+
+input,select{
+width:100%;
+padding:8px;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:14px;
+box-sizing:border-box;
 }
 
 .row{
@@ -49,53 +65,25 @@ gap:10px;
 flex:1;
 }
 
-label{
-font-size:14px;
-font-weight:bold;
-display:block;
-margin-bottom:4px;
-}
-
-input, select{
-width:100%;
-padding:8px;
-border-radius:6px;
-border:1px solid #ccc;
-font-size:14px;
-box-sizing:border-box;
-}
-
-input:focus, select:focus{
-outline:none;
-border-color:#2c7be5;
-}
-
-.smallInput{
-width:70px;
-}
-
-.materialRow{
-display:flex;
-gap:10px;
-align-items:flex-end;
-margin-top:10px;
-}
-
-.materialRow input{
-width:90px;
-}
-
 .timeRow{
 display:flex;
 gap:10px;
 }
 
 .timeRow input{
-width:70px;
+width:80px;
+}
+
+button.secondary{
+background:#6c757d;
+}
+
+button.secondary:hover{
+background:#545b62;
 }
 
 .totalBox{
-font-size:18px;
+font-size:20px;
 font-weight:bold;
 text-align:center;
 margin-top:10px;
