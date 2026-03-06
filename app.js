@@ -140,9 +140,19 @@ Stampante<select id="printerSelect"></select>
 
 <h3>Tempo stampa</h3>
 
-Ore<input id="hours" type="number">
-Minuti<input id="minutes" type="number">
-
+// --- Tempo stampa ottimizzato ---
+html += `
+<div class="timeRow">
+  <div class="timeField">
+    <label>Ore</label>
+    <input id="hours" type="number" min="0" max="99" maxlength="2" placeholder="00">
+  </div>
+  <div class="timeField">
+    <label>Minuti</label>
+    <input id="minutes" type="number" min="0" max="59" maxlength="2" placeholder="00">
+  </div>
+</div>
+`;
 <div class="totalBox">
 
 Materiale: <span id="matCost">0</span> €<br>
