@@ -12,7 +12,16 @@ localStorage.setItem("prints", JSON.stringify(prints));
 
 }
 
+function showMenu(){
+
+document.getElementById("menu").style.display="block";
+document.getElementById("content").innerHTML="";
+
+}
+
 function showPage(page){
+
+document.getElementById("menu").style.display="none";
 
 if(page=="new") newPrintPage();
 if(page=="history") historyPage();
@@ -21,9 +30,19 @@ if(page=="printers") printerPage();
 
 }
 
+function backButton(){
+
+return `<button class="back" onclick="showMenu()">← Indietro</button>`;
+
+}
+
+/* FILAMENTI */
+
 function filamentPage(){
 
-let html=`<h2>Database Filamenti</h2>
+let html=backButton()+`
+
+<h2>Database Filamenti</h2>
 
 Marca<input id="fMarca">
 Tipo<input id="fTipo">
@@ -59,10 +78,10 @@ function addFilament(){
 
 filaments.push({
 
-marca:document.getElementById("fMarca").value,
-tipo:document.getElementById("fTipo").value,
-colore:document.getElementById("fColore").value,
-prezzo:Number(document.getElementById("fPrezzo").value)
+marca:fMarca.value,
+tipo:fTipo.value,
+colore:fColore.value,
+prezzo:Number(fPrezzo.value)
 
 });
 
@@ -71,9 +90,13 @@ filamentPage();
 
 }
 
+/* STAMPANTI */
+
 function printerPage(){
 
-let html=`<h2>Database Stampanti</h2>
+let html=backButton()+`
+
+<h2>Database Stampanti</h2>
 
 Marca<input id="pMarca">
 Modello<input id="pModello">
@@ -106,9 +129,9 @@ function addPrinter(){
 
 printers.push({
 
-marca:document.getElementById("pMarca").value,
-modello:document.getElementById("pModello").value,
-consumo:Number(document.getElementById("pConsumo").value)
+marca:pMarca.value,
+modello:pModello.value,
+consumo:Number(pConsumo.value)
 
 });
 
@@ -117,9 +140,13 @@ printerPage();
 
 }
 
+/* NUOVA STAMPA */
+
 function newPrintPage(){
 
-let html=`<h2>Nuova Stampa</h2>
+let html=backButton()+`
+
+<h2>Nuova Stampa</h2>
 
 Nome stampa<input id="printName">
 
@@ -133,6 +160,7 @@ Stampante<select id="printerSelect"></select>
 <th>€/g</th>
 <th>g</th>
 <th>€</th>
+<th></th>
 </tr>
 </table>
 
@@ -140,8 +168,13 @@ Stampante<select id="printerSelect"></select>
 
 <h3>Tempo stampa</h3>
 
-Ore<input id="hours" type="number">
-Minuti<input id="minutes" type="number">
+<div class="timeRow">
+
+Ore <input id="hours" type="number" max="99">
+
+Min <input id="minutes" type="number" max="59">
+
+</div>
 
 <div class="totalBox">
 
@@ -158,7 +191,6 @@ Energia: <span id="energyCost">0</span> €<br>
 document.getElementById("content").innerHTML=html;
 
 loadPrinters();
-
 addFilamentRow();
 
 }
@@ -183,22 +215,33 @@ function addFilamentRow(){
 
 let table=document.getElementById("filamentTable");
 
-if(table.rows.length>5) return;
+if(table.rows.length>10) return;
 
 let row=table.insertRow();
 
 row.innerHTML=`
+
 <td><select class="marca"></select></td>
 <td><select class="tipo"></select></td>
 <td><select class="colore"></select></td>
 <td class="prezzo"></td>
 <td><input type="number" class="grammi"></td>
 <td class="costo"></td>
+<td><button class="deleteBtn" onclick="deleteRow(this)">X</button></td>
 `;
 
 loadMarche(row);
 
 }
+
+function deleteRow(btn){
+
+btn.parentElement.parentElement.remove();
+updateTotals();
+
+}
+
+/* resto codice identico al tuo */
 
 function loadMarche(row){
 
@@ -213,7 +256,6 @@ sel.add(o);
 });
 
 sel.onchange=()=>loadTipi(row);
-
 loadTipi(row);
 
 }
@@ -236,7 +278,6 @@ sel.add(o);
 });
 
 sel.onchange=()=>loadColori(row);
-
 loadColori(row);
 
 }
@@ -260,7 +301,6 @@ sel.add(o);
 });
 
 sel.onchange=()=>updatePrice(row);
-
 updatePrice(row);
 
 }
@@ -286,7 +326,6 @@ row.querySelector(".grammi").oninput=()=>calcRow(row);
 function calcRow(row){
 
 let g=row.querySelector(".grammi").value;
-
 let p=row.querySelector(".prezzo").innerText;
 
 let cost=g*p;
@@ -304,13 +343,9 @@ let rows=document.querySelectorAll("#filamentTable tr");
 let mat=0;
 
 rows.forEach((r,i)=>{
-
 if(i==0) return;
-
 let c=r.querySelector(".costo");
-
 if(c) mat+=Number(c.innerText||0);
-
 });
 
 document.getElementById("matCost").innerText=mat.toFixed(2);
@@ -326,11 +361,9 @@ document.getElementById("printerSelect").value
 
 let energy=h*printer.consumo*energyPrice;
 
-document.getElementById("energyCost").innerText=
-energy.toFixed(2);
+document.getElementById("energyCost").innerText=energy.toFixed(2);
 
-document.getElementById("totalCost").innerText=
-(mat+energy).toFixed(2);
+document.getElementById("totalCost").innerText=(mat+energy).toFixed(2);
 
 }
 
@@ -356,7 +389,9 @@ alert("Stampa salvata");
 
 function historyPage(){
 
-let html=`<h2>Storico Stampe</h2>
+let html=backButton()+`
+
+<h2>Storico Stampe</h2>
 
 <table>
 <tr>
