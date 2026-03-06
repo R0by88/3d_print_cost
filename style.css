@@ -1,0 +1,41 @@
+body{
+font-family:Arial;
+margin:20px;
+background:#f5f5f5;
+}
+
+h1{
+text-align:center;
+}
+
+button{
+padding:12px;
+margin:5px 0;
+width:100%;
+font-size:16px;
+}
+
+input,select{
+padding:8px;
+margin:5px 0;
+width:100%;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+td,th{
+border:1px solid #ccc;
+padding:6px;
+text-align:center;
+}
+
+.totalBox{
+margin-top:20px;
+padding:10px;
+background:white;
+border-radius:5px;
+}
