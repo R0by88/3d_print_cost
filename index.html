@@ -12,26 +12,25 @@
 
 </head>
 
-
 <body>
 
-<div class="container">
+<div class="app">
 
 <h1>3D Print Cost</h1>
 
-<div class="menu">
+<div id="menu">
 
-<button onclick="newPrintPage()">Nuova stampa</button>
+<button onclick="showPage('new')">Nuova stampa</button>
 
-<button onclick="historyPage()">Storico</button>
+<button onclick="showPage('history')">Storico</button>
 
-<button onclick="printersPage()">Stampanti</button>
+<button onclick="showPage('filaments')">Database filamenti</button>
 
-<button onclick="filamentsPage()">Filamenti</button>
+<button onclick="showPage('printers')">Database stampanti</button>
 
 </div>
 
-<div id="app"></div>
+<div id="content"></div>
 
 </div>
 
