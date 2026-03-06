@@ -1,90 +1,117 @@
 body{
 font-family:Arial, Helvetica, sans-serif;
-background:#f4f6f8;
+background:#eef1f4;
 margin:0;
 padding:0;
 }
 
-.container{
+/* contenitore app */
+
+.app{
 max-width:420px;
 margin:auto;
 padding:15px;
 }
+
+/* titolo */
 
 h1{
 text-align:center;
 margin-bottom:20px;
 }
 
-.menu button{
-width:100%;
-padding:12px;
+/* menu */
+
+#menu{
+margin-bottom:20px;
+}
+
+#menu button{
+padding:14px;
 margin-bottom:10px;
+width:100%;
+font-size:16px;
 border:none;
 border-radius:10px;
 background:#2c7be5;
 color:white;
-font-size:16px;
 cursor:pointer;
 }
 
-.menu button:hover{
+#menu button:hover{
 background:#1a68d1;
 }
 
-.card{
-background:white;
-padding:15px;
-border-radius:12px;
-margin-bottom:15px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-
-label{
-font-size:14px;
-font-weight:bold;
-display:block;
-margin-bottom:5px;
-}
+/* input */
 
 input,select{
+padding:10px;
+margin:6px 0;
 width:100%;
-padding:8px;
+box-sizing:border-box;
 border-radius:8px;
 border:1px solid #ccc;
 font-size:14px;
-box-sizing:border-box;
 }
 
-.row{
-display:flex;
-gap:10px;
+/* bottoni */
+
+button{
+padding:12px;
+margin:10px 0;
+width:100%;
+font-size:15px;
+border:none;
+border-radius:8px;
+background:#2c7be5;
+color:white;
+cursor:pointer;
 }
 
-.col{
-flex:1;
+button:hover{
+background:#1a68d1;
 }
 
-.timeRow{
-display:flex;
-gap:10px;
+/* tabelle */
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+background:white;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 
-.timeRow input{
-width:80px;
+td,th{
+border-bottom:1px solid #eee;
+padding:8px;
+text-align:center;
+font-size:13px;
 }
 
-button.secondary{
-background:#6c757d;
+th{
+background:#f7f7f7;
 }
 
-button.secondary:hover{
-background:#545b62;
-}
+/* box totali */
 
 .totalBox{
-font-size:20px;
-font-weight:bold;
+margin-top:20px;
+padding:15px;
+background:white;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
 text-align:center;
+}
+
+.totalBox h3{
 margin-top:10px;
+}
+
+/* tempo stampa */
+
+#hours,#minutes{
+width:80px;
 }
