@@ -13,7 +13,6 @@ let filaments = [
 
 let filamentCount=0;
 let accessoryCount=0;
-
 const maxFilaments=10;
 const maxAccessories=10;
 
@@ -21,14 +20,13 @@ const maxAccessories=10;
 function showTab(tab){
     let content=document.getElementById("content");
     content.innerHTML="";
-
     if(tab=="nuova") newPrintPage();
     if(tab=="stampanti") content.innerHTML="<h2>Database Stampanti</h2>";
     if(tab=="filamenti") content.innerHTML="<h2>Database Filamenti</h2>";
     if(tab=="storico") content.innerHTML="<h2>Storico</h2>";
 }
 
-// NUOVA STAMPA PROFESSIONALE
+// NUOVA STAMPA
 function newPrintPage(){
     filamentCount=0;
     accessoryCount=0;
@@ -72,7 +70,7 @@ function newPrintPage(){
 <th></th>
 </tr>
 </table>
-<button onclick="addFilamentRow()">+ Filamento</button>
+<button class="addBtn" onclick="addFilamentRow()">+ Filamento</button>
 </div>
 
 <!-- Accessori -->
@@ -81,11 +79,13 @@ function newPrintPage(){
 <table id="accessoryTable">
 <tr>
 <th>Nome</th>
-<th>€</th>
+<th>Prezzo €</th>
+<th>Quantità</th>
+<th>Totale €</th>
 <th></th>
 </tr>
 </table>
-<button onclick="addAccessory()">+ Accessorio</button>
+<button class="addBtn" onclick="addAccessory()">+ Accessorio</button>
 </div>
 
 <!-- Riepilogo -->
@@ -95,6 +95,7 @@ Materiale: <span id="matCost">0</span> €<br>
 Energia: <span id="energyCost">0</span> €<br>
 Accessori: <span id="accCost">0</span> €<br>
 <h3>Totale costi: <span id="totalCost">0</span> €</h3>
+
 <h3>Vendita</h3>
 Ricarico % <input id="ricarico" type="number" oninput="updateSale()">
 IVA % <input id="iva" type="number" oninput="updateSale()">
@@ -112,6 +113,7 @@ addFilamentRow();
 // STAMPANTI
 function loadPrinters(){
     let sel=document.getElementById("printerSelect");
+    sel.innerHTML="";
     printers.forEach((p,i)=>{
         let o=document.createElement("option");
         o.value=i;
@@ -138,10 +140,10 @@ function addFilamentRow(){
 <td><select class="filamentoMarca"></select></td>
 <td><select class="filamentoTipo"></select></td>
 <td><select class="filamentoColore"></select></td>
-<td class="prezzo"></td>
+<td class="filamentoCosto"></td>
 <td><input type="number" class="filamentoGrammi" max="9999" oninput="calcRow(this.parentElement.parentElement)"></td>
 <td class="costo"></td>
-<td><button onclick="removeRow(this)">X</button></td>
+<td><button class="removeBtn" onclick="removeRow(this)">X</button></td>
 `;
     loadMarche(row);
 }
@@ -151,10 +153,11 @@ function removeRow(btn){
     updateTotals();
 }
 
-// CASCATA FILAMENTI
+// Cascata filamenti
 function loadMarche(row){
     let marche=[...new Set(filaments.map(f=>f.marca))];
     let sel=row.querySelector(".filamentoMarca");
+    sel.innerHTML="";
     marche.forEach(m=>{
         let o=document.createElement("option");
         o.text=m;
@@ -199,13 +202,12 @@ function updatePrice(row){
     let colore=row.querySelector(".filamentoColore").value;
     let f=filaments.find(x=>x.marca==marca && x.tipo==tipo && x.colore==colore);
     let price=Math.ceil((f.prezzo/1000)*1000)/1000;
-    row.querySelector(".prezzo").innerText=price;
+    row.querySelector(".filamentoCosto").innerText=price;
 }
 
-// Calcolo costo riga filamento
 function calcRow(row){
     let g=row.querySelector(".filamentoGrammi").value;
-    let p=row.querySelector(".prezzo").innerText;
+    let p=row.querySelector(".filamentoCosto").innerText;
     let cost=g*p;
     row.querySelector(".costo").innerText=cost.toFixed(2);
     updateTotals();
@@ -218,10 +220,20 @@ function addAccessory(){
     let table=document.getElementById("accessoryTable");
     let row=table.insertRow();
     row.innerHTML=`
-<td><input class="accessoryName" style="width:200px"></td>
-<td><input type="number" class="accessoryPrice" style="width:80px" oninput="updateTotals()"></td>
-<td><button onclick="removeRow(this)">X</button></td>
+<td><input class="accessoryName"></td>
+<td><input type="number" class="accessoryPrice" oninput="calcAccessoryRow(this.parentElement.parentElement)"></td>
+<td><input type="number" class="accessoryQty" oninput="calcAccessoryRow(this.parentElement.parentElement)"></td>
+<td class="accessoryTotal"></td>
+<td><button class="removeBtn" onclick="removeRow(this)">X</button></td>
 `;
+}
+
+function calcAccessoryRow(row){
+    let price=row.querySelector(".accessoryPrice").value||0;
+    let qty=row.querySelector(".accessoryQty").value||0;
+    let total=price*qty;
+    row.querySelector(".accessoryTotal").innerText=total.toFixed(2);
+    updateTotals();
 }
 
 // TOTALI
@@ -235,7 +247,7 @@ function updateTotals(){
     document.getElementById("matCost").innerText=mat.toFixed(2);
 
     let acc=0;
-    document.querySelectorAll(".accessoryPrice").forEach(a=>acc+=Number(a.value||0));
+    document.querySelectorAll(".accessoryTotal").forEach(a=>acc+=Number(a.innerText||0));
     document.getElementById("accCost").innerText=acc.toFixed(2);
 
     let hours=document.getElementById("hours").value||0;
@@ -261,7 +273,6 @@ function updateSale(){
     updateProfit();
 }
 
-// Guadagno NON considera IVA
 function updateProfit(){
     let sale=document.getElementById("salePrice").value||0;
     let cost=Number(document.getElementById("totalCost").innerText);
