@@ -1,96 +1,29 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>3D PRINT COST</title>
-
+<title>3D Print Cost Dashboard</title>
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
-<div id="menuPrincipale" class="container">
+<h1>3D Print Cost</h1>
 
-<h1>3D PRINT COST</h1>
-
-<button onclick="apriMenu('nuovaStampa')">NUOVA STAMPA</button>
-
-<button onclick="apriMenu('storico')">STORICO</button>
-
-<button onclick="apriMenu('stampanti')">STAMPANTI</button>
-
-<button onclick="apriMenu('filamenti')">FILAMENTI</button>
-
+<!-- CONTENUTO PRINCIPALE -->
+<div id="content" class="content">
+<!-- qui verrà caricato il contenuto della scheda -->
 </div>
 
-
-<div id="nuovaStampa" class="container hidden">
-
-<button onclick="tornaMenu()">⬅ INDIETRO</button>
-
-<h2>Nuova Stampa</h2>
-
-<label>Nome stampa</label>
-<input id="nomeStampa">
-
-<label>Stampante</label>
-<select id="stampante"></select>
-
-<div class="tempo">
-
-<label>Tempo stampa</label>
-
-<input id="ore" type="number" placeholder="HH" max="99">
-
-<span>:</span>
-
-<input id="minuti" type="number" placeholder="MM" max="59">
-
+<!-- MENU DASHBOARD IN BASSO -->
+<div class="dashboard">
+<button onclick="showTab('nuova')">Nuova Stampa</button>
+<button onclick="showTab('stampanti')">Stampanti</button>
+<button onclick="showTab('filamenti')">Filamenti</button>
+<button onclick="showTab('storico')">Storico</button>
 </div>
 
-<h3>Filamenti</h3>
-
-<div id="listaFilamenti"></div>
-
-<button onclick="aggiungiFilamento()">+ AGGIUNGI FILAMENTO</button>
-
-</div>
-
-
-<div id="stampanti" class="container hidden">
-
-<button onclick="tornaMenu()">⬅ INDIETRO</button>
-
-<h2>Stampanti</h2>
-
-</div>
-
-
-<div id="filamenti" class="container hidden">
-
-<button onclick="tornaMenu()">⬅ INDIETRO</button>
-
-<h2>Filamenti</h2>
-
-</div>
-
-
-<div id="storico" class="container hidden">
-
-<button onclick="tornaMenu()">⬅ INDIETRO</button>
-
-<h2>Storico stampe</h2>
-
-</div>
-
-
-<script src="script.js"></script>
-
+<script src="app.js"></script>
 </body>
-
 </html>
