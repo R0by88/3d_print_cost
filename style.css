@@ -26,7 +26,6 @@ h1{
     border-radius: 10px;
 }
 
-/* DASHBOARD IN BASSO */
 .dashboard{
     display:flex;
     justify-content: space-around;
@@ -50,7 +49,6 @@ h1{
     background:#154aa0;
 }
 
-/* INPUT GENERALI */
 input, select, button{
     padding:6px;
     margin:3px 0;
@@ -58,7 +56,6 @@ input, select, button{
     border:1px solid #ccc;
 }
 
-/* TABLES */
 table{
     width:100%;
     border-collapse:collapse;
@@ -72,8 +69,10 @@ th, td{
 }
 
 /* FILAMENTI */
-.filamentoRow select{
+.filamentoRow select, .filamentoGrammi{
     padding:4px;
+    width:100%;
+    box-sizing:border-box;
 }
 
 .filamentoMarca, .filamentoTipo, .filamentoColore{
@@ -86,7 +85,12 @@ th, td{
 }
 
 .filamentoCosto{
-    width:80px;
+    width:60px;
+    font-weight:bold;
+}
+
+.filamentoTotal{
+    width:100px;
     font-weight:bold;
 }
 
@@ -112,23 +116,25 @@ th, td{
     text-align:center;
 }
 
-/* BOTTONI AGGIUNGI/RIMUOVI */
+/* BOTTONI */
 .addBtn{
     background:green;
     color:white;
     border:none;
-    border-radius:5px;
-    padding:4px 8px;
-    cursor:pointer;
+    border-radius:50%;
+    width:25px;
+    height:25px;
     font-weight:bold;
+    cursor:pointer;
 }
 
 .removeBtn{
+    width:25px;
+    height:25px;
     background:red;
     color:white;
     border:none;
-    border-radius:5px;
-    padding:4px 8px;
-    cursor:pointer;
+    border-radius:50%;
     font-weight:bold;
+    cursor:pointer;
 }
