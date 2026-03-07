@@ -1,44 +1,77 @@
-const API = "https://script.google.com/macros/s/AKfycbxRJZtJk6JWsn-WRpJOtIj4DyoqOEcJ4Mo3l8F-zaZjB3Fguz7DbfiC6ghbha2-bmUM/exec"
+let contatoreFilamenti=0
+let maxFilamenti=10
 
 
-async function caricaStampanti(){
+function apriMenu(menu){
 
-const res = await fetch(API + "?sheet=stampanti")
-const data = await res.json()
+document.getElementById("menuPrincipale").classList.add("hidden")
 
-const select = document.getElementById("stampante")
+document.getElementById(menu).classList.remove("hidden")
 
-data.forEach(s=>{
-let option = document.createElement("option")
-option.value = s.MODELLO
-option.text = s.MARCA + " " + s.MODELLO
-select.appendChild(option)
+}
+
+
+function tornaMenu(){
+
+document.querySelectorAll(".container").forEach(el=>{
+
+el.classList.add("hidden")
+
 })
 
-}
-
-async function salva(){
-
-let dati = {
-
-sheet:"storico",
-
-nome:document.getElementById("nome").value,
-stampante:document.getElementById("stampante").value,
-tempo:document.getElementById("tempo").value,
-filamento:document.getElementById("filamento").value,
-accessori:document.getElementById("accessori").value,
-pezzi:document.getElementById("pezzi").value
+document.getElementById("menuPrincipale").classList.remove("hidden")
 
 }
 
-await fetch(API,{
-method:"POST",
-body:JSON.stringify(dati)
-})
 
-alert("Stampa salvata!")
+
+function aggiungiFilamento(){
+
+if(contatoreFilamenti>=maxFilamenti) return
+
+contatoreFilamenti++
+
+let riga=document.createElement("div")
+
+riga.className="filamentoRow"
+
+riga.id="fil"+contatoreFilamenti
+
+riga.innerHTML=`
+
+<select>
+
+<option>Marca</option>
+
+</select>
+
+<select>
+
+<option>Tipo</option>
+
+</select>
+
+<select>
+
+<option>Colore</option>
+
+</select>
+
+<input placeholder="grammi" type="number">
+
+<button onclick="eliminaFilamento('fil${contatoreFilamenti}')">X</button>
+
+`
+
+document.getElementById("listaFilamenti").appendChild(riga)
 
 }
 
-caricaStampanti()
+
+function eliminaFilamento(id){
+
+document.getElementById(id).remove()
+
+contatoreFilamenti--
+
+}
