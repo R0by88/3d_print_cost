@@ -45,7 +45,7 @@ function newPrintPage(){
 <h3>Stampante</h3>
 <select id="printerSelect"></select>
 <label>Consumo (W/h)</label>
-<input id="printerPower" readonly>
+<input id="printerPower" readonly maxlength="4">
 </div>
 
 <!-- Stampa -->
@@ -202,7 +202,7 @@ function updatePrice(row){
     let colore=row.querySelector(".filamentoColore").value;
     let f=filaments.find(x=>x.marca==marca && x.tipo==tipo && x.colore==colore);
     let price=Math.ceil((f.prezzo/1000)*1000)/1000;
-    row.querySelector(".filamentoCosto").innerText=price;
+    row.querySelector(".filamentoCosto").innerText=price.toFixed(3);
 }
 
 function calcRow(row){
