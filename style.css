@@ -75,6 +75,7 @@ th, td{
 #printerPower{
     width:50px;
     text-align:center;
+    margin-left:20px; /* maggiore spazio tra select e consumo */
 }
 
 /* FILAMENTI */
@@ -84,13 +85,13 @@ th, td{
 }
 
 .filamentoMarca{
-    width:100px;
+    width:95px; /* leggermente più stretta */
 }
 .filamentoTipo{
-    width:50px; /* molto stretta */
+    width:49px; /* leggermente più stretta */
 }
 .filamentoColore{
-    width:200px; /* molto larga */
+    width:206px; /* allargata recuperando lo spazio */
 }
 .filamentoGrammi{
     width:60px;
@@ -107,10 +108,10 @@ th, td{
 
 /* ACCESSORI */
 .accessoryName{
-    width:220px;
+    width:236px; /* più largo recuperando spazio da prezzo+quantità */
 }
 .accessoryPrice, .accessoryQty{
-    width:60px;
+    width:52px; /* leggermente più stretti */
     text-align:center;
 }
 .accessoryTotal{
