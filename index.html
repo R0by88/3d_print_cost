@@ -1,37 +1,41 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>3D Print Cost</title>
-
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
-<div class="app">
+<h1>Calcolo Costo Stampa 3D</h1>
 
-<h1>3D Print Cost</h1>
+<div class="box">
 
-<div id="menu">
+<label>Nome stampa</label>
+<input id="nome">
 
-<button onclick="showPage('new')">Nuova stampa</button>
-<button onclick="showPage('history')">Storico</button>
-<button onclick="showPage('filaments')">Database filamenti</button>
-<button onclick="showPage('printers')">Database stampanti</button>
+<label>Stampante</label>
+<select id="stampante"></select>
+
+<label>Tempo stampa (ore)</label>
+<input id="tempo" type="number">
+
+<label>Filamento (g)</label>
+<input id="filamento" type="number">
+
+<label>Accessori (€)</label>
+<input id="accessori" type="number">
+
+<label>Pezzi venduti</label>
+<input id="pezzi" type="number">
+
+<button onclick="salva()">SALVA STAMPA</button>
 
 </div>
 
-<div id="content"></div>
-
-</div>
-
-<script src="app.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
