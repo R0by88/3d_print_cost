@@ -54,6 +54,7 @@ input, select, button{
     margin:3px 0;
     border-radius:5px;
     border:1px solid #ccc;
+    box-sizing:border-box;
 }
 
 table{
@@ -75,27 +76,27 @@ th, td{
 #printerPower{
     width:50px;
     text-align:center;
-    margin-left:20px; /* maggiore spazio tra select e consumo */
+    margin-left:20px;
 }
 
 /* FILAMENTI */
 .filamentoRow select, .filamentoGrammi{
     padding:4px;
     box-sizing:border-box;
+    width:100%;
 }
 
 .filamentoMarca{
-    width:95px; /* leggermente più stretta */
+    width:100%; /* campo editabile piena larghezza della colonna */
 }
 .filamentoTipo{
-    width:49px; /* leggermente più stretta */
+    width:100%;
 }
 .filamentoColore{
-    width:206px; /* allargata recuperando lo spazio */
+    width:100%;
 }
 .filamentoGrammi{
-    width:60px;
-    text-align:center;
+    width:100%;
 }
 .filamentoCosto{
     width:60px;
@@ -108,11 +109,10 @@ th, td{
 
 /* ACCESSORI */
 .accessoryName{
-    width:236px; /* più largo recuperando spazio da prezzo+quantità */
+    width:100%;
 }
 .accessoryPrice, .accessoryQty{
-    width:52px; /* leggermente più stretti */
-    text-align:center;
+    width:100%;
 }
 .accessoryTotal{
     width:100px;
