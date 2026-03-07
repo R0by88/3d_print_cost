@@ -5,7 +5,8 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3D PRINT COST PRO</title>
+
+<title>3D PRINT COST</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -13,61 +14,83 @@
 
 <body>
 
+<div id="menuPrincipale" class="container">
+
 <h1>3D PRINT COST</h1>
 
-<div class="menu">
+<button onclick="apriMenu('nuovaStampa')">NUOVA STAMPA</button>
 
-<button onclick="apriTab('stampa')">NUOVA STAMPA</button>
-<button onclick="apriTab('storico')">STORICO</button>
+<button onclick="apriMenu('storico')">STORICO</button>
+
+<button onclick="apriMenu('stampanti')">STAMPANTI</button>
+
+<button onclick="apriMenu('filamenti')">FILAMENTI</button>
 
 </div>
 
-<div id="stampa" class="tab">
 
-<h2>Nuova stampa</h2>
+<div id="nuovaStampa" class="container hidden">
+
+<button onclick="tornaMenu()">⬅ INDIETRO</button>
+
+<h2>Nuova Stampa</h2>
 
 <label>Nome stampa</label>
-<input id="nome">
+<input id="nomeStampa">
 
 <label>Stampante</label>
 <select id="stampante"></select>
 
-<label>Filamento</label>
-<select id="filamento"></select>
+<div class="tempo">
 
-<label>Tempo stampa (ore)</label>
-<input id="tempo" type="number">
+<label>Tempo stampa</label>
 
-<label>Filamento usato (grammi)</label>
-<input id="grammi" type="number">
+<input id="ore" type="number" placeholder="HH" max="99">
 
-<label>Accessori (€)</label>
-<input id="accessori" type="number">
+<span>:</span>
 
-<label>Pezzi venduti</label>
-<input id="pezzi" type="number">
-
-<button onclick="calcola()">CALCOLA</button>
-
-<div id="risultato"></div>
-
-<button onclick="salva()">SALVA</button>
+<input id="minuti" type="number" placeholder="MM" max="59">
 
 </div>
 
-<div id="storico" class="tab">
+<h3>Filamenti</h3>
+
+<div id="listaFilamenti"></div>
+
+<button onclick="aggiungiFilamento()">+ AGGIUNGI FILAMENTO</button>
+
+</div>
+
+
+<div id="stampanti" class="container hidden">
+
+<button onclick="tornaMenu()">⬅ INDIETRO</button>
+
+<h2>Stampanti</h2>
+
+</div>
+
+
+<div id="filamenti" class="container hidden">
+
+<button onclick="tornaMenu()">⬅ INDIETRO</button>
+
+<h2>Filamenti</h2>
+
+</div>
+
+
+<div id="storico" class="container hidden">
+
+<button onclick="tornaMenu()">⬅ INDIETRO</button>
 
 <h2>Storico stampe</h2>
 
-<table id="tabellaStorico">
-
-</table>
-
 </div>
 
-<script src="api.js"></script>
-<script src="calcolo.js"></script>
-<script src="ui.js"></script>
+
+<script src="script.js"></script>
 
 </body>
+
 </html>
