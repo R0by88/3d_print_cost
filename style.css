@@ -2,7 +2,7 @@ body{
     font-family: Arial, sans-serif;
     margin:0;
     padding:0;
-    background:#f4f4f4;
+    background:#f2f2f2;
     display:flex;
     flex-direction: column;
     min-height: 100vh;
@@ -20,6 +20,10 @@ h1{
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    max-width: 900px;
+    margin:auto;
+    background:white;
+    border-radius: 10px;
 }
 
 /* DASHBOARD IN BASSO */
@@ -46,7 +50,7 @@ h1{
     background:#154aa0;
 }
 
-/* STILI GENERALI INPUT/TABLE */
+/* INPUT GENERALI */
 input, select, button{
     padding:8px;
     margin:5px 0;
@@ -54,6 +58,7 @@ input, select, button{
     border:1px solid #ccc;
 }
 
+/* TABELLE */
 table{
     width:100%;
     border-collapse:collapse;
@@ -63,5 +68,41 @@ table{
 th, td{
     border:1px solid #ccc;
     padding:6px;
+    text-align:center;
+}
+
+/* FILAMENTI layout */
+.filamentoRow select{
+    padding:6px;
+}
+
+.filamentoMarca, .filamentoTipo, .filamentoColore{
+    width:150px;
+}
+
+.filamentoGrammi{
+    width:60px;
+    text-align:center;
+}
+
+/* ACCESSORI layout */
+.accessoryName{
+    width:200px;
+}
+
+.accessoryPrice{
+    width:80px;
+    text-align:center;
+}
+
+/* TEMPO */
+.tempo{
+    display:flex;
+    gap:5px;
+    align-items:center;
+}
+
+.tempo input{
+    width:60px;
     text-align:center;
 }
