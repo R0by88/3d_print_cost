@@ -52,13 +52,13 @@ h1{
 
 /* INPUT GENERALI */
 input, select, button{
-    padding:8px;
-    margin:5px 0;
+    padding:6px;
+    margin:3px 0;
     border-radius:5px;
     border:1px solid #ccc;
 }
 
-/* TABELLE */
+/* TABLES */
 table{
     width:100%;
     border-collapse:collapse;
@@ -71,13 +71,13 @@ th, td{
     text-align:center;
 }
 
-/* FILAMENTI layout */
+/* FILAMENTI */
 .filamentoRow select{
-    padding:6px;
+    padding:4px;
 }
 
 .filamentoMarca, .filamentoTipo, .filamentoColore{
-    width:150px;
+    width:100px;
 }
 
 .filamentoGrammi{
@@ -85,12 +85,17 @@ th, td{
     text-align:center;
 }
 
-/* ACCESSORI layout */
+.filamentoCosto{
+    width:80px;
+    font-weight:bold;
+}
+
+/* ACCESSORI */
 .accessoryName{
     width:200px;
 }
 
-.accessoryPrice{
+.accessoryPrice, .accessoryQty, .accessoryTotal{
     width:80px;
     text-align:center;
 }
@@ -105,4 +110,25 @@ th, td{
 .tempo input{
     width:60px;
     text-align:center;
+}
+
+/* BOTTONI AGGIUNGI/RIMUOVI */
+.addBtn{
+    background:green;
+    color:white;
+    border:none;
+    border-radius:5px;
+    padding:4px 8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.removeBtn{
+    background:red;
+    color:white;
+    border:none;
+    border-radius:5px;
+    padding:4px 8px;
+    cursor:pointer;
+    font-weight:bold;
 }
