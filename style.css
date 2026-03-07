@@ -1,116 +1,36 @@
 body{
-font-family:Arial, Helvetica, sans-serif;
-background:#eef1f4;
-margin:0;
-padding:0;
-}
 
-.app{
-max-width:600px;
-margin:auto;
-padding:15px;
-}
-
-h1{
+font-family:Arial;
+background:#f4f4f4;
 text-align:center;
-margin-bottom:20px;
+
 }
 
-#menu button{
-padding:14px;
-margin-bottom:10px;
-width:100%;
-font-size:16px;
-border:none;
+.box{
+
+background:white;
+padding:20px;
+width:300px;
+margin:auto;
 border-radius:10px;
-background:#2c7be5;
-color:white;
-cursor:pointer;
-}
 
-button{
-padding:12px;
-margin:10px 0;
-border:none;
-border-radius:8px;
-background:#2c7be5;
-color:white;
-cursor:pointer;
-}
-
-button.back{
-background:#6c757d;
-width:120px;
 }
 
 input,select{
+
+width:100%;
 padding:8px;
-margin:4px 0;
+margin:5px 0;
+
+}
+
+button{
+
+background:#2196f3;
+color:white;
+padding:10px;
+border:none;
 width:100%;
-box-sizing:border-box;
-border-radius:8px;
-border:1px solid #ccc;
-font-size:14px;
-}
+cursor:pointer;
 
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-background:white;
-border-radius:10px;
-overflow:hidden;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
-
-td,th{
-border-bottom:1px solid #eee;
-padding:6px;
-text-align:center;
-font-size:13px;
-}
-
-th{
-background:#f7f7f7;
-}
-
-.totalBox{
-margin-top:20px;
-padding:15px;
-background:white;
-border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-text-align:center;
-}
-
-/* tempo stampa compatto */
-
-.timeRow{
-display:flex;
-gap:10px;
-align-items:center;
-}
-
-.timeRow input{
-width:60px;
-}
-
-/* tabella filamenti più larga */
-
-#filamentTable select{
-min-width:90px;
-}
-
-#filamentTable .colore{
-min-width:110px;
-}
-
-#filamentTable .marca{
-min-width:110px;
-}
-
-.deleteBtn{
-background:#dc3545;
-padding:5px 8px;
-font-size:12px;
 }
