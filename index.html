@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3D Print Cost</title>
+<title>3D PRINT COST PRO</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-<h1>Calcolo Costo Stampa 3D</h1>
+<h1>3D PRINT COST</h1>
 
-<div class="box">
+<div class="menu">
+
+<button onclick="apriTab('stampa')">NUOVA STAMPA</button>
+<button onclick="apriTab('storico')">STORICO</button>
+
+</div>
+
+<div id="stampa" class="tab">
+
+<h2>Nuova stampa</h2>
 
 <label>Nome stampa</label>
 <input id="nome">
@@ -19,11 +32,14 @@
 <label>Stampante</label>
 <select id="stampante"></select>
 
+<label>Filamento</label>
+<select id="filamento"></select>
+
 <label>Tempo stampa (ore)</label>
 <input id="tempo" type="number">
 
-<label>Filamento (g)</label>
-<input id="filamento" type="number">
+<label>Filamento usato (grammi)</label>
+<input id="grammi" type="number">
 
 <label>Accessori (€)</label>
 <input id="accessori" type="number">
@@ -31,11 +47,27 @@
 <label>Pezzi venduti</label>
 <input id="pezzi" type="number">
 
-<button onclick="salva()">SALVA STAMPA</button>
+<button onclick="calcola()">CALCOLA</button>
+
+<div id="risultato"></div>
+
+<button onclick="salva()">SALVA</button>
 
 </div>
 
-<script src="script.js"></script>
+<div id="storico" class="tab">
+
+<h2>Storico stampe</h2>
+
+<table id="tabellaStorico">
+
+</table>
+
+</div>
+
+<script src="api.js"></script>
+<script src="calcolo.js"></script>
+<script src="ui.js"></script>
 
 </body>
 </html>
