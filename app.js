@@ -66,11 +66,11 @@ function newPrintPage(){
 <th>Colore</th>
 <th>€/g</th>
 <th>g</th>
-<th>€</th>
+<th>Totale</th>
 <th></th>
 </tr>
 </table>
-<button class="addBtn" onclick="addFilamentRow()">+ Filamento</button>
+<button class="addBtn" onclick="addFilamentRow()">+</button>
 </div>
 
 <!-- Accessori -->
@@ -85,7 +85,7 @@ function newPrintPage(){
 <th></th>
 </tr>
 </table>
-<button class="addBtn" onclick="addAccessory()">+ Accessorio</button>
+<button class="addBtn" onclick="addAccessory()">+</button>
 </div>
 
 <!-- Riepilogo -->
@@ -136,13 +136,14 @@ function addFilamentRow(){
     filamentCount++;
     let table=document.getElementById("filamentTable");
     let row=table.insertRow();
+    row.classList.add("filamentoRow");
     row.innerHTML=`
 <td><select class="filamentoMarca"></select></td>
 <td><select class="filamentoTipo"></select></td>
 <td><select class="filamentoColore"></select></td>
 <td class="filamentoCosto"></td>
 <td><input type="number" class="filamentoGrammi" max="9999" oninput="calcRow(this.parentElement.parentElement)"></td>
-<td class="costo"></td>
+<td class="filamentoTotal"></td>
 <td><button class="removeBtn" onclick="removeRow(this)">X</button></td>
 `;
     loadMarche(row);
@@ -153,7 +154,6 @@ function removeRow(btn){
     updateTotals();
 }
 
-// Cascata filamenti
 function loadMarche(row){
     let marche=[...new Set(filaments.map(f=>f.marca))];
     let sel=row.querySelector(".filamentoMarca");
@@ -206,10 +206,10 @@ function updatePrice(row){
 }
 
 function calcRow(row){
-    let g=row.querySelector(".filamentoGrammi").value;
-    let p=row.querySelector(".filamentoCosto").innerText;
-    let cost=g*p;
-    row.querySelector(".costo").innerText=cost.toFixed(2);
+    let g=row.querySelector(".filamentoGrammi").value||0;
+    let p=row.querySelector(".filamentoCosto").innerText||0;
+    let total=g*p;
+    row.querySelector(".filamentoTotal").innerText=total.toFixed(2);
     updateTotals();
 }
 
@@ -239,9 +239,8 @@ function calcAccessoryRow(row){
 // TOTALI
 function updateTotals(){
     let mat=0;
-    document.querySelectorAll("#filamentTable tr").forEach((r,i)=>{
-        if(i==0) return;
-        let c=r.querySelector(".costo");
+    document.querySelectorAll("#filamentTable .filamentoRow").forEach(r=>{
+        let c=r.querySelector(".filamentoTotal");
         if(c) mat+=Number(c.innerText||0);
     });
     document.getElementById("matCost").innerText=mat.toFixed(2);
