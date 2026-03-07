@@ -20,7 +20,7 @@ h1{
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    max-width: 900px;
+    max-width: 950px;
     margin:auto;
     background:white;
     border-radius: 10px;
@@ -70,16 +70,16 @@ th, td{
 
 /* STAMPANTE */
 #printerSelect{
-    width:300px;
+    width:400px;
 }
 #printerPower{
-    width:60px;
+    width:50px;
+    text-align:center;
 }
 
 /* FILAMENTI */
 .filamentoRow select, .filamentoGrammi{
     padding:4px;
-    width:100%;
     box-sizing:border-box;
 }
 
@@ -87,10 +87,10 @@ th, td{
     width:100px;
 }
 .filamentoTipo{
-    width:60px; /* più stretta */
+    width:50px; /* molto stretta */
 }
 .filamentoColore{
-    width:140px; /* più larga */
+    width:200px; /* molto larga */
 }
 .filamentoGrammi{
     width:60px;
@@ -101,17 +101,21 @@ th, td{
     font-weight:bold;
 }
 .filamentoTotal{
-    width:100px;
+    width:120px;
     font-weight:bold;
 }
 
 /* ACCESSORI */
 .accessoryName{
-    width:200px;
+    width:220px;
 }
-.accessoryPrice, .accessoryQty, .accessoryTotal{
-    width:70px;
+.accessoryPrice, .accessoryQty{
+    width:60px;
     text-align:center;
+}
+.accessoryTotal{
+    width:100px;
+    font-weight:bold;
 }
 
 /* TEMPO */
