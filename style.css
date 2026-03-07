@@ -1,79 +1,67 @@
 body{
-
-font-family:Arial;
-background:#f2f2f2;
-margin:0;
-padding:0;
-text-align:center;
-
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:0;
+    background:#f4f4f4;
+    display:flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.container{
-
-max-width:900px;
-margin:auto;
-background:white;
-padding:30px;
-margin-top:30px;
-border-radius:10px;
-
+h1{
+    text-align: center;
+    padding: 10px 0;
+    margin:0;
+    background:#2c7be5;
+    color:white;
 }
 
-button{
-
-padding:10px 20px;
-margin:10px;
-border:none;
-background:#2c7be5;
-color:white;
-border-radius:5px;
-cursor:pointer;
-
+.content{
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
 }
 
-button:hover{
-
-background:#1a5dc9;
-
+/* DASHBOARD IN BASSO */
+.dashboard{
+    display:flex;
+    justify-content: space-around;
+    background:#1a5dc9;
+    padding:10px 0;
 }
 
-input,select{
-
-width:100%;
-padding:8px;
-margin:10px 0;
-border:1px solid #ccc;
-border-radius:5px;
-
+.dashboard button{
+    flex:1;
+    padding:10px;
+    margin:0 5px;
+    background:#2c7be5;
+    border:none;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
+    font-weight:bold;
 }
 
-.hidden{
-
-display:none;
-
+.dashboard button:hover{
+    background:#154aa0;
 }
 
-.tempo{
-
-display:flex;
-justify-content:center;
-align-items:center;
-gap:10px;
-
+/* STILI GENERALI INPUT/TABLE */
+input, select, button{
+    padding:8px;
+    margin:5px 0;
+    border-radius:5px;
+    border:1px solid #ccc;
 }
 
-.tempo input{
-
-width:60px;
-text-align:center;
-
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
 }
 
-.filamentoRow{
-
-display:grid;
-grid-template-columns:1fr 1fr 1fr 100px 50px;
-gap:10px;
-margin-bottom:10px;
-
+th, td{
+    border:1px solid #ccc;
+    padding:6px;
+    text-align:center;
 }
