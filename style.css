@@ -68,6 +68,14 @@ th, td{
     text-align:center;
 }
 
+/* STAMPANTE */
+#printerSelect{
+    width:300px;
+}
+#printerPower{
+    width:60px;
+}
+
 /* FILAMENTI */
 .filamentoRow select, .filamentoGrammi{
     padding:4px;
@@ -75,20 +83,23 @@ th, td{
     box-sizing:border-box;
 }
 
-.filamentoMarca, .filamentoTipo, .filamentoColore{
+.filamentoMarca{
     width:100px;
 }
-
+.filamentoTipo{
+    width:60px; /* più stretta */
+}
+.filamentoColore{
+    width:140px; /* più larga */
+}
 .filamentoGrammi{
     width:60px;
     text-align:center;
 }
-
 .filamentoCosto{
     width:60px;
     font-weight:bold;
 }
-
 .filamentoTotal{
     width:100px;
     font-weight:bold;
@@ -98,9 +109,8 @@ th, td{
 .accessoryName{
     width:200px;
 }
-
 .accessoryPrice, .accessoryQty, .accessoryTotal{
-    width:80px;
+    width:70px;
     text-align:center;
 }
 
@@ -110,7 +120,6 @@ th, td{
     gap:5px;
     align-items:center;
 }
-
 .tempo input{
     width:60px;
     text-align:center;
@@ -127,7 +136,6 @@ th, td{
     font-weight:bold;
     cursor:pointer;
 }
-
 .removeBtn{
     width:25px;
     height:25px;
