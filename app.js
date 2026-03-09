@@ -44,8 +44,10 @@ function newPrintPage(){
 <div>
     <h3>Stampante</h3>
     <select id="printerSelect" style="width:calc(100% - 12px)"></select>
-    <label>Consumo (W/h)</label>
-    <input id="printerPower" readonly maxlength="4" style="width:70px;">
+    <div style="display:flex; gap:10px; align-items:center;">
+        <label>Consumo (W/h)</label>
+        <input id="printerPower" readonly maxlength="4" style="width:70px;">
+    </div>
 </div>
 
 <!-- Stampa -->
