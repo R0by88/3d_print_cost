@@ -85,13 +85,13 @@ th, td{
 }
 
 .filamentoMarca{
-    width:70%;
+    width:calc(60% - 12px); /* Diminuita la larghezza della colonna */
 }
 .filamentoTipo{
-    width:calc(100% - 12px);
+    width:calc(90% - 12px); /* Aumentato campo editabile per "Tipo" */
 }
 .filamentoColore{
-    width:100%;
+    width:calc(100% - 12px); /* Aumentata la larghezza della colonna per "Colore" */
 }
 .filamentoGrammi{
     width:60px;
