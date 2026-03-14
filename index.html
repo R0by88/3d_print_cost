@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Costo Stampa 3D</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        body { padding-bottom: 5rem; } /* Spazio per la dashboard in basso */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans text-gray-900" x-data="app()" x-cloak>
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
+        <h1 class="text-xl font-bold" x-text="screens[activeScreen].name"></h1>
+        <div x-show="syncing" class="flex items-center text-xs space-x-2 bg-blue-700 px-2 py-1 rounded">
+            <i class="fas fa-sync fa-spin"></i>
+            <span>Sincronizzazione...</span>
+        </div>
+    </header>
+
+    <!-- Contenuto Principale -->
+    <main class="container mx-auto p-4 max-w-2xl">
+        
+        <!-- Schermata 1: Calcolo Costo -->
+        <div x-show="activeScreen === 0" class="space-y-6 pb-24">
+            <!-- Nome Stampa -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Nome Stampa</label>
+                <input type="text" x-model="calc.name" placeholder="Inserisci nome stampa..." 
+                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border">
+            </div>
+
+            <!-- Stampante -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Stampante</label>
+                        <select x-model="calc.printerId"
+                                class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border text-sm">
+                            <option value="">Seleziona...</option>
+                            <template x-for="p in printers" :key="p.id">
+                                <option :value="p.id" x-text="`${p.marca} ${p.modello}`"></option>
+                            </template>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Consumo (W/h)</label>
+                        <input type="number" :value="selectedPrinter ? selectedPrinter.consumo_wh : ''" disabled
+                               class="w-full bg-gray-50 border-gray-300 rounded-md shadow-sm p-2 border text-gray-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tempi di Stampa e Manodopera -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="grid grid-cols-2 gap-6">
+                    <!-- Tempo di Stampa -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tempo di Stampa</label>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-16">
+                                <input type="text" x-model="calc.hours" placeholder="Ore"
+                                       inputmode="decimal"
+                                       @input="calc.hours = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 3)"
+                                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border text-center text-sm">
+                            </div>
+                            <span class="text-gray-500 font-bold">:</span>
+                            <div class="w-16">
+                                <input type="text" x-model="calc.minutes" placeholder="Min"
+                                       inputmode="decimal"
+                                       @input="calc.minutes = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 3)"
+                                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border text-center text-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tempo Manodopera -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tempo Manodopera</label>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-16">
+                                <input type="text" x-model="calc.laborHours" placeholder="Ore"
+                                       inputmode="decimal"
+                                       @input="calc.laborHours = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 3)"
+                                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border text-center text-sm">
+                            </div>
+                            <span class="text-gray-500 font-bold">:</span>
+                            <div class="w-16">
+                                <input type="text" x-model="calc.laborMinutes" placeholder="Min"
+                                       inputmode="decimal"
+                                       @input="calc.laborMinutes = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 3)"
+                                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border text-center text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filamenti -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-sm font-bold uppercase text-gray-500 tracking-wider">Filamenti</h2>
+                    <button @click="addFilament()" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                        <i class="fas fa-plus mr-1"></i> Aggiungi
+                    </button>
+                </div>
+                <div class="space-y-3">
+                    <template x-for="(f, index) in calc.usedFilaments" :key="index">
+                        <div class="p-3 border rounded-md bg-gray-50 relative flex items-end gap-2 overflow-x-auto no-scrollbar">
+                            <button @click="removeFilament(index)" class="absolute -top-2 -right-2 bg-white text-red-500 hover:text-red-700 shadow-sm rounded-full w-6 h-6 flex items-center justify-center border border-red-100 z-10">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                            
+                            <!-- Marca: fissa -->
+                            <div class="w-24 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Marca</label>
+                                <select x-model="f.brand" @change="updateFilamentBrand(index)"
+                                        class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs bg-white">
+                                    <option value="">Marca...</option>
+                                    <template x-for="brand in uniqueBrands" :key="brand">
+                                        <option :value="brand" x-text="brand"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <!-- Tipo: allargato -->
+                            <div class="w-28 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Tipo</label>
+                                <select x-model="f.type" @change="updateFilamentType(index)" :disabled="!f.brand"
+                                        class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs bg-white disabled:bg-gray-100">
+                                    <option value="">Tipo...</option>
+                                    <template x-for="type in getFilteredTypes(f.brand)" :key="type">
+                                        <option :value="type" x-text="type"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <!-- Colore: ristretto -->
+                            <div class="flex-grow min-w-[100px]">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Colore</label>
+                                <select x-model="f.color" @change="updateFilamentColor(index)" :disabled="!f.type"
+                                        class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs bg-white disabled:bg-gray-100">
+                                    <option value="">Colore...</option>
+                                    <template x-for="colorName in getFilteredColors(f.brand, f.type)" :key="colorName">
+                                        <option :value="colorName" x-text="colorName"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <!-- €/g: piccolo -->
+                            <div class="w-14 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1 text-center">€/g</label>
+                                <input type="text" :value="f.pricePerGram" disabled
+                                       class="w-full bg-gray-100 border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center font-mono">
+                            </div>
+
+                            <!-- Grammi: ridotto (max 4 cifre) -->
+                            <div class="w-14 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1 text-center">Grammi</label>
+                                <input type="text" x-model="f.gramsUsed" placeholder="0"
+                                       inputmode="decimal"
+                                       @input="f.gramsUsed = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 4)"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center">
+                            </div>
+
+                            <!-- Totale: ridotto (max 2 cifre + . + 2 decimali) -->
+                            <div class="w-16 flex-shrink-0 text-right">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Totale</label>
+                                <div class="p-1.5 text-xs font-bold text-blue-700 truncate" 
+                                     x-text="formatEuro(f.pricePerGram * (f.gramsUsed || 0))"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Accessori -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-sm font-bold uppercase text-gray-500 tracking-wider">Accessori</h2>
+                    <button @click="addAccessory()" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                        <i class="fas fa-plus mr-1"></i> Aggiungi
+                    </button>
+                </div>
+                <div class="space-y-3">
+                    <template x-for="(acc, index) in calc.usedAccessories" :key="index">
+                        <div class="p-3 border rounded-md bg-gray-50 relative flex gap-3 items-end">
+                            <button @click="removeAccessory(index)" class="absolute -top-2 -right-2 bg-white text-red-500 hover:text-red-700 shadow-sm rounded-full w-6 h-6 flex items-center justify-center border border-red-100 z-10">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                            
+                            <div class="flex-grow">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Nome Accessorio</label>
+                                <input type="text" x-model="acc.name" placeholder="es. Molla, Cuscinetto..."
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs">
+                            </div>
+
+                            <div class="w-20">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Prezzo (€)</label>
+                                <input type="text" x-model="acc.price" placeholder="0.00"
+                                       inputmode="decimal"
+                                       @input="acc.price = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 6)"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center">
+                            </div>
+
+                            <div class="w-16">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Quantità</label>
+                                <input type="text" x-model="acc.qty" placeholder="0"
+                                       inputmode="decimal"
+                                       @input="acc.qty = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 3)"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center">
+                            </div>
+
+                            <div class="w-20 text-right">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Totale</label>
+                                <div class="p-1.5 text-xs font-bold text-blue-700" x-text="formatEuro((acc.price || 0) * (acc.qty || 0))"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Riepilogo -->
+            <div class="bg-white p-4 rounded-lg shadow-md border-t-4 border-blue-600">
+                <h2 class="text-lg font-bold mb-4">Riepilogo Costi</h2>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>Costo Energia</span>
+                        <span x-text="formatEuro(energyCost)"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Ammortamento Stampante</span>
+                        <span x-text="formatEuro(ammortamentoCost)"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Costo Filamenti</span>
+                        <span x-text="formatEuro(filamentsTotalCost)"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Costo Accessori</span>
+                        <span x-text="formatEuro(accessoriesTotalCost)"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Costo Manodopera</span>
+                        <span x-text="formatEuro(laborTotalCost)"></span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="flex justify-between font-bold text-lg">
+                        <span>Costo Totale</span>
+                        <span x-text="formatEuro(totalProductionCost)"></span>
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600">IVA (%)</label>
+                        <input type="text" x-model="calc.iva" placeholder="0"
+                               inputmode="decimal"
+                               @input="calc.iva = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
+                               class="w-full border-gray-300 rounded-md shadow-sm p-2 border text-sm mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600">Rincaro (%)</label>
+                        <input type="text" x-model="calc.markup" placeholder="0"
+                               inputmode="decimal"
+                               @input="calc.markup = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
+                               class="w-full border-gray-300 rounded-md shadow-sm p-2 border text-sm mt-1">
+                    </div>
+                </div>
+
+                <div class="mt-6 space-y-3 p-4 bg-blue-50 rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Prezzo di Vendita</span>
+                        <span class="text-xl font-bold text-blue-700" x-text="formatEuro(sellingPrice)"></span>
+                    </div>
+                    <div class="flex justify-between items-center text-green-600">
+                        <span class="font-semibold">Guadagno (al netto IVA)</span>
+                        <span class="text-lg font-bold" x-text="formatEuro(profit)"></span>
+                    </div>
+                </div>
+
+                <!-- Azioni Storico -->
+                <div class="mt-6">
+                    <button @click="saveHistory()" :disabled="!calc.name || syncing"
+                            class="w-full bg-green-600 text-white p-3 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:opacity-50">
+                        <i class="fas fa-save mr-2"></i> SALVA NELLO STORICO
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schermata 2: Stampanti -->
+        <div x-show="activeScreen === 1" class="space-y-6 pb-24">
+            <!-- Lista Stampanti -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-sm font-bold uppercase text-gray-500 tracking-wider">Le mie Stampanti</h2>
+                    <button @click="addPrinter()" class="bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-plus mr-1"></i> Aggiungi Stampante
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <template x-for="(p, index) in printers" :key="p.id">
+                        <div class="p-3 border rounded-md bg-gray-50 relative flex items-end gap-2 overflow-x-auto no-scrollbar">
+                            <button @click="removePrinter(index)" class="absolute -top-2 -right-2 bg-white text-red-500 hover:text-red-700 shadow-sm rounded-full w-6 h-6 flex items-center justify-center border border-red-100 z-10">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                            
+                            <div class="flex-1 min-w-[70px]">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Marca</label>
+                                <input type="text" x-model="p.marca" placeholder="Creality" @input="debouncedSave()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs bg-white">
+                            </div>
+
+                            <div class="flex-1 min-w-[70px]">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Modello</label>
+                                <input type="text" x-model="p.modello" placeholder="Ender 3" @input="debouncedSave()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs bg-white">
+                            </div>
+
+                            <div class="w-12 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1 text-center">W/h</label>
+                                <input type="text" x-model="p.consumo_wh" placeholder="0"
+                                       inputmode="decimal"
+                                       @input="p.consumo_wh = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 4); debouncedSave()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center">
+                            </div>
+
+                            <div class="w-20 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1 text-center">Data</label>
+                                <input type="text" x-model="p.data_acquisto" placeholder="gg/mm/aa" @input="debouncedSave()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center bg-white">
+                            </div>
+
+                            <div class="w-16 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1 text-center">€ Acq.</label>
+                                <input type="text" x-model="p.prezzo_acquisto" placeholder="0"
+                                       inputmode="decimal"
+                                       @input="p.prezzo_acquisto = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); debouncedSave()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center bg-white">
+                            </div>
+
+                            <div class="w-16 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1 text-center">Amm. €/h</label>
+                                <input type="text" x-model="p.ammortamento_ora" placeholder="0.00"
+                                         inputmode="decimal"
+                                         @input="p.ammortamento_ora = ($event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').match(/^\d?(\.\d{0,2})?/)?.[0] || ''); debouncedSave()"
+                                         class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center bg-white">
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="printers.length === 0">
+                        <div class="text-center py-8 text-gray-400 italic text-sm border-2 border-dashed rounded-lg">
+                            Nessuna stampante aggiunta. Clicca su "Aggiungi" per iniziare.
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schermata 3: Filamenti -->
+        <div x-show="activeScreen === 2" class="space-y-6 pb-24">
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-sm font-bold uppercase text-gray-500 tracking-wider">Gestione Filamenti</h2>
+                    <div class="flex gap-2">
+                        <button @click="sortFilaments(); debouncedSave()" class="bg-gray-500 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-sort-alpha-down mr-1"></i> Ordina
+                        </button>
+                        <button @click="addFilamentToInventory()" class="bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-plus mr-1"></i> Aggiungi Filamento
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <template x-for="(fil, index) in filaments" :key="fil.id">
+                        <div class="p-3 border rounded-md bg-gray-50 relative flex flex-wrap gap-2 items-end">
+                            <button @click="removeFilamentFromInventory(index)" class="absolute -top-2 -right-2 bg-white text-red-500 hover:text-red-700 shadow-sm rounded-full w-6 h-6 flex items-center justify-center border border-red-100 z-10">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                            
+                            <div class="flex-1 min-w-[100px]">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Marca</label>
+                                <input type="text" x-model="fil.marca" placeholder="es. Sunlu" 
+                                       @input="debouncedSave()" @change="saveToCloud()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs bg-white">
+                            </div>
+
+                            <div class="w-20 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Tipo</label>
+                                <input type="text" x-model="fil.tipo" placeholder="es. PLA" 
+                                       @input="debouncedSave()" @change="saveToCloud()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs bg-white">
+                            </div>
+
+                            <div class="flex-grow min-w-[100px]">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1">Colore</label>
+                                <input type="text" x-model="fil.colore" placeholder="es. Nero" 
+                                       @input="debouncedSave()" @change="saveToCloud()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs bg-white">
+                            </div>
+
+                            <div class="w-20 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1 text-center">€/kg</label>
+                                <input type="text" x-model="fil.prezzo_kg" placeholder="0.00"
+                                       inputmode="decimal"
+                                       @input="fil.prezzo_kg = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); debouncedSave()"
+                                       @change="saveToCloud()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center">
+                            </div>
+
+                            <div class="w-16 flex-shrink-0">
+                                <label class="block text-[10px] font-semibold text-gray-600 mb-1 text-center">€/g</label>
+                                <div class="w-full bg-gray-100 border-gray-300 rounded-md shadow-sm p-1.5 border text-xs text-center font-mono text-blue-600 font-bold"
+                                     x-text="(Math.ceil((fil.prezzo_kg / 1000) * 1000) / 1000).toFixed(3)">
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="filaments.length === 0">
+                        <div class="text-center py-8 text-gray-400 italic text-sm border-2 border-dashed rounded-lg">
+                            Nessun filamento in magazzino. Clicca su "Aggiungi" per iniziare.
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schermata 4: Storico -->
+        <div x-show="activeScreen === 3" class="space-y-4 pb-24" x-data="{ selectedItem: null }">
+            <div class="flex justify-between items-center px-1">
+                <h2 class="text-sm font-bold uppercase text-gray-500 tracking-wider">Storico Stampe</h2>
+                <button @click="loadFromCloud()" class="text-blue-600 text-xs font-bold">
+                    <i class="fas fa-sync-alt mr-1"></i> Aggiorna
+                </button>
+            </div>
+            
+            <div class="space-y-3">
+                <template x-for="h in history" :key="h.id_storico || h.data_salvataggio + h.nome_stampa">
+                    <div @click="selectedItem = h" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
+                        <div class="flex justify-between items-center">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-blue-700 truncate mr-2" x-text="h.nome_stampa"></h3>
+                                <p class="text-[10px] text-gray-400" x-text="h.data_salvataggio"></p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold text-green-600" x-text="formatEuro(h.guadagno_totale)"></div>
+                                <div class="text-[10px] text-gray-400" x-text="`${h.numero_stampe} pz.`"></div>
+                            </div>
+                            <div class="ml-3 text-gray-300">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <template x-if="history.length === 0">
+                    <div class="text-center py-20 text-gray-400 italic">
+                        <i class="fas fa-history text-4xl mb-4 opacity-20"></i>
+                        <p>Nessuna stampa salvata nello storico.</p>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Modal Dettaglio Storico -->
+            <div x-show="selectedItem" 
+                 class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50"
+                 x-cloak>
+                <div @click.away="selectedItem = null" class="bg-gray-100 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
+                    <div class="sticky top-0 bg-blue-600 text-white p-4 flex justify-between items-center z-10">
+                        <h2 class="font-bold truncate" x-text="selectedItem ? selectedItem.nome_stampa : ''"></h2>
+                        <button @click="selectedItem = null" class="text-white hover:text-gray-200 p-1">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="p-4 space-y-4" x-if="selectedItem">
+                        <!-- Info Base -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Data Salvataggio</span>
+                                <span class="font-medium" x-text="selectedItem.data_salvataggio"></span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Stampante</span>
+                                <span class="font-medium" x-text="selectedItem.stampante"></span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Tempo Stampa</span>
+                                <span class="font-medium" x-text="`${selectedItem.tempo_h}h ${selectedItem.tempo_m}m`"></span>
+                            </div>
+                        </div>
+
+                        <!-- Numero Stampe (Editabile) -->
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-center justify-between">
+                            <div>
+                                <label class="block text-xs font-bold text-blue-700 uppercase">Quantità Stampe Eseguite</label>
+                                <p class="text-[10px] text-blue-500">Modifica per aggiornare il guadagno</p>
+                            </div>
+                            <div class="w-20">
+                                <input type="number" 
+                                       x-model="selectedItem.numero_stampe" 
+                                       @change="updateHistoryQuantity(selectedItem)"
+                                       min="1"
+                                       class="w-full border-blue-300 rounded-md shadow-sm p-2 border text-center font-bold text-blue-700">
+                            </div>
+                        </div>
+
+                        <!-- Dettagli Costi -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm space-y-2 text-sm">
+                            <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Dettaglio Costi Unitari</h3>
+                            <div class="flex justify-between">
+                                <span>Energia</span>
+                                <span x-text="formatEuro(selectedItem.costo_energia)"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Ammortamento</span>
+                                <span x-text="formatEuro(selectedItem.costo_ammortamento)"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Filamenti</span>
+                                <span x-text="formatEuro(selectedItem.costo_filamenti)"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Accessori</span>
+                                <span x-text="formatEuro(selectedItem.costo_accessori)"></span>
+                            </div>
+                            <div class="flex justify-between border-t pt-2 font-bold text-blue-600">
+                                <span>Costo Totale Produzione</span>
+                                <span x-text="formatEuro(selectedItem.costo_totale)"></span>
+                            </div>
+                        </div>
+
+                        <!-- Riepilogo Vendita e Guadagno -->
+                        <div class="bg-white p-4 rounded-lg shadow-md border-t-4 border-green-500 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Prezzo Vendita (Cad.)</span>
+                                <span class="text-lg font-bold text-gray-900" x-text="formatEuro(selectedItem.prezzo_vendita)"></span>
+                            </div>
+                            <div class="flex justify-between items-center border-t pt-2">
+                                <span class="text-green-700 font-bold">Guadagno Totale</span>
+                                <div class="text-right">
+                                    <div class="text-2xl font-black text-green-600" x-text="formatEuro((selectedItem.prezzo_vendita - selectedItem.costo_totale) * selectedItem.numero_stampe)"></div>
+                                    <div class="text-[10px] text-gray-400" x-text="`Su ${selectedItem.numero_stampe} stampe`"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Materiali Utilizzati -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm space-y-3">
+                            <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Materiali Utilizzati</h3>
+                            
+                            <!-- Filamenti -->
+                            <div class="space-y-2">
+                                <template x-for="f in JSON.parse(selectedItem.dettaglio_filamenti || '[]')" :key="f.marca + f.colore">
+                                    <div class="flex justify-between text-[11px] bg-gray-50 p-2 rounded">
+                                        <div>
+                                            <span class="font-bold text-gray-700" x-text="f.marca"></span>
+                                            <span class="text-gray-500" x-text="f.tipo"></span>
+                                            <span class="text-gray-400" x-text="f.colore"></span>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="font-bold" x-text="`${f.grammi}g`"></div>
+                                            <div class="text-gray-400" x-text="formatEuro(f.costo)"></div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Accessori -->
+                            <div class="space-y-2 border-t pt-2">
+                                <template x-for="a in JSON.parse(selectedItem.dettaglio_accessori || '[]')" :key="a.name">
+                                    <div class="flex justify-between text-[11px] bg-gray-50 p-2 rounded">
+                                        <div class="font-medium text-gray-700" x-text="a.name"></div>
+                                        <div class="text-right">
+                                            <div class="font-bold" x-text="`x${a.qty}`"></div>
+                                            <div class="text-gray-400" x-text="formatEuro(a.price * a.qty)"></div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schermata 5: Impostazioni -->
+        <div x-show="activeScreen === 4" class="space-y-6 pb-24">
+            <!-- Sincronizzazione Cloud -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold uppercase text-gray-500 tracking-wider">Sincronizzazione Cloud</h2>
+                    <span :class="cloudUrl ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'" 
+                          class="text-[10px] px-2 py-0.5 rounded-full font-bold"
+                          x-text="cloudUrl ? 'Configurato' : 'Locale'"></span>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-semibold text-gray-600 mb-1">URL Google Apps Script</label>
+                        <input type="text" x-model="cloudUrl" placeholder="Incolla l'URL dello script qui..." 
+                               class="w-full border-gray-300 rounded-md shadow-sm p-2 border text-xs bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Costo Energia e Manodopera -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-sm font-bold uppercase text-gray-500 tracking-wider">Costo Energia</h2>
+                            <p class="text-[10px] text-gray-400">Costo attuale al kW/h</p>
+                        </div>
+                        <div class="w-32">
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-xs">€</span>
+                                <input type="text" x-model="calc.energyPrice" placeholder="0.00"
+                                       inputmode="decimal"
+                                       @input="calc.energyPrice = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); debouncedSave()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-2 pl-7 border text-sm text-right font-bold text-blue-600">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-sm font-bold uppercase text-gray-500 tracking-wider">Costo Manodopera</h2>
+                            <p class="text-[10px] text-gray-400">Costo orario manodopera</p>
+                        </div>
+                        <div class="w-32">
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-xs">€</span>
+                                <input type="text" x-model="calc.laborPrice" placeholder="0.00"
+                                       inputmode="decimal"
+                                       @input="calc.laborPrice = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); debouncedSave()"
+                                       class="w-full border-gray-300 rounded-md shadow-sm p-2 pl-7 border text-sm text-right font-bold text-blue-600">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Azioni Manuali -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-sm font-bold uppercase text-gray-500 tracking-wider mb-3">Azioni Manuali</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <button @click="saveToCloud(true)" :disabled="syncing"
+                            class="bg-blue-600 text-white p-3 rounded-lg text-xs font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i> FORZA INVIO SU CLOUD
+                    </button>
+                    <button @click="loadFromCloud(true)" :disabled="syncing"
+                            class="bg-gray-600 text-white p-3 rounded-lg text-xs font-bold hover:bg-gray-700 disabled:opacity-50 transition-colors">
+                        <i class="fas fa-cloud-download-alt mr-2"></i> FORZA SCARICAMENTO
+                    </button>
+                </div>
+                <p class="text-[10px] text-gray-400 mt-3 italic">Usa "Forza Invio" se hai appena aggiunto dati e vuoi essere sicuro di salvarli subito. Usa "Forza Scaricamento" per recuperare i dati dal foglio Excel.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Dashboard di Navigazione (Basso) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-20">
+        <div class="flex justify-around items-center h-16 max-w-2xl mx-auto">
+            <button @click="activeScreen = 0" 
+                    :class="activeScreen === 0 ? 'text-blue-600' : 'text-gray-400'"
+                    class="flex flex-col items-center justify-center w-full h-full transition-colors">
+                <i class="fas fa-calculator text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">Calcolo</span>
+            </button>
+            <button @click="activeScreen = 1" 
+                    :class="activeScreen === 1 ? 'text-blue-600' : 'text-gray-400'"
+                    class="flex flex-col items-center justify-center w-full h-full transition-colors">
+                <i class="fas fa-print text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">Stampanti</span>
+            </button>
+            <button @click="activeScreen = 2" 
+                    :class="activeScreen === 2 ? 'text-blue-600' : 'text-gray-400'"
+                    class="flex flex-col items-center justify-center w-full h-full transition-colors">
+                <i class="fas fa-layer-group text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">Filamenti</span>
+            </button>
+            <button @click="activeScreen = 3" 
+                    :class="activeScreen === 3 ? 'text-blue-600' : 'text-gray-400'"
+                    class="flex flex-col items-center justify-center w-full h-full transition-colors">
+                <i class="fas fa-history text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">Storico</span>
+            </button>
+            <button @click="activeScreen = 4" 
+                    :class="activeScreen === 4 ? 'text-blue-600' : 'text-gray-400'"
+                    class="flex flex-col items-center justify-center w-full h-full transition-colors">
+                <i class="fas fa-cog text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">Impostazioni</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        function app() {
+            return {
+                activeScreen: 0,
+                screens: [
+                    { name: 'Calcolo Costo' },
+                    { name: 'Stampanti' },
+                    { name: 'Filamenti' },
+                    { name: 'Storico Stampe' },
+                    { name: 'Impostazioni' }
+                ],
+                
+                printers: [],
+                filaments: [],
+                history: [],
+                
+                // Stato del calcolatore
+                calc: {
+                    name: '',
+                    printerId: '',
+                    hours: '',
+                    minutes: '',
+                    laborHours: '',
+                    laborMinutes: '',
+                    usedFilaments: [],
+                    usedAccessories: [],
+                    iva: '',
+                    markup: '',
+                    energyPrice: 0.25,
+                    laborPrice: 15.00
+                },
+                
+                // Stato Cloud
+                cloudUrl: localStorage.getItem('3d_costo_cloud_url') || '',
+                syncing: false,
+                saveTimeout: null,
+
+                init() {
+                    this.$watch('cloudUrl', value => {
+                        localStorage.setItem('3d_costo_cloud_url', value);
+                        if (value) this.loadFromCloud();
+                    });
+
+                    // Caricamento iniziale
+                    if (this.cloudUrl) {
+                        this.loadFromCloud();
+                    } else {
+                        const localData = localStorage.getItem('3d_costo_local_data');
+                        if (localData) {
+                            const parsed = JSON.parse(localData);
+                            this.printers = parsed.printers || [];
+                            this.filaments = parsed.filaments || [];
+                            this.calc.energyPrice = parsed.energyPrice || 0.25;
+                        }
+                    }
+                },
+
+                loadFromCloud(isManual = false) {
+                    if (!this.cloudUrl || this.syncing) return;
+                    this.syncing = true;
+                    fetch(this.cloudUrl)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Errore di rete');
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Funzione di conversione sicura: restituisce sempre un numero valido o 0
+                            const safeNumber = (val) => {
+                                if (val === undefined || val === null || val === '') return 0;
+                                let s = String(val).trim().replace(',', '.');
+                                // Rimuove caratteri non numerici tranne il punto decimale
+                                s = s.replace(/[^0-9.]/g, '');
+                                // Gestisce punti multipli
+                                const parts = s.split('.');
+                                if (parts.length > 2) s = parts[0] + '.' + parts.slice(1).join('');
+                                const n = parseFloat(s);
+                                return isNaN(n) ? 0 : n;
+                            };
+
+                            if (data.printers && (data.printers.length > 0 || this.printers.length === 0)) {
+                                this.printers = data.printers.map(p => ({
+                                    ...p,
+                                    consumo_wh: safeNumber(p.consumo_wh),
+                                    prezzo_acquisto: safeNumber(p.prezzo_acquisto),
+                                    ammortamento_ora: safeNumber(p.ammortamento_ora)
+                                }));
+                            }
+                            if (data.filaments && (data.filaments.length > 0 || this.filaments.length === 0)) {
+                                this.filaments = data.filaments.map(f => ({
+                                    ...f,
+                                    prezzo_kg: safeNumber(f.prezzo_kg)
+                                }));
+                                this.sortFilaments();
+                            }
+                            
+                            // Caricamento e sanitizzazione dello storico
+                            this.history = (data.history || []).map(h => ({
+                                ...h,
+                                costo_energia: safeNumber(h.costo_energia),
+                                costo_filamenti: safeNumber(h.costo_filamenti),
+                                costo_accessori: safeNumber(h.costo_accessori),
+                                costo_manodopera: safeNumber(h.costo_manodopera),
+                                costo_ammortamento: safeNumber(h.costo_ammortamento),
+                                costo_totale: safeNumber(h.costo_totale),
+                                prezzo_vendita: safeNumber(h.prezzo_vendita),
+                                numero_stampe: safeNumber(h.numero_stampe) || 1,
+                                guadagno_totale: safeNumber(h.guadagno_totale)
+                            })).reverse();
+                            
+                            if (data.settings) {
+                                const energyPrice = data.settings.find(s => s.key === 'energyPrice');
+                                if (energyPrice) this.calc.energyPrice = safeNumber(energyPrice.value);
+                                const laborPrice = data.settings.find(s => s.key === 'laborPrice');
+                                if (laborPrice) this.calc.laborPrice = safeNumber(laborPrice.value);
+                            }
+                            
+                            this.saveLocal();
+                            if (isManual) alert('Dati scaricati con successo!');
+                        })
+                        .catch(err => {
+                            console.error('Errore caricamento cloud:', err);
+                            if (isManual) alert('Errore caricamento cloud. Verifica l\'URL.');
+                        })
+                        .finally(() => this.syncing = false);
+                },
+
+                saveToCloud(isManual = false) {
+                    if (!this.cloudUrl || this.syncing) return;
+                    
+                    this.syncing = true;
+                    this.sortFilaments();
+                    const payload = {
+                        printers: this.printers,
+                        filaments: this.filaments,
+                        settings: [
+                            { key: 'energyPrice', value: this.calc.energyPrice },
+                            { key: 'laborPrice', value: this.calc.laborPrice }
+                        ]
+                    };
+                    
+                    fetch(this.cloudUrl, {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    })
+                    .then(() => {
+                        if (isManual) alert('Dati inviati al cloud con successo!');
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        if (isManual) alert('Errore durante l\'invio al cloud.');
+                    })
+                    .finally(() => this.syncing = false);
+                },
+
+                async saveHistory() {
+                    if (!this.cloudUrl || !this.calc.name) return;
+                    this.syncing = true;
+                    try {
+                        // Formatta data in gg/mm/aa
+                        const now = new Date();
+                        const dd = String(now.getDate()).padStart(2, '0');
+                        const mm = String(now.getMonth() + 1).padStart(2, '0');
+                        const yy = String(now.getFullYear()).slice(-2);
+                        const shortDate = `${dd}/${mm}/${yy}`;
+
+                        const historyItem = {
+                            id_storico: Date.now().toString(),
+                            data_salvataggio: shortDate,
+                            nome_stampa: this.calc.name,
+                            stampante: this.selectedPrinter ? `${this.selectedPrinter.marca} ${this.selectedPrinter.modello}` : 'N/D',
+                            tempo_h: Number(this.calc.hours) || 0,
+                            tempo_m: Number(this.calc.minutes) || 0,
+                            tempo_manodopera_h: Number(this.calc.laborHours) || 0,
+                            tempo_manodopera_m: Number(this.calc.laborMinutes) || 0,
+                            costo_energia: Number(this.energyCost.toFixed(2)),
+                            costo_filamenti: Number(this.filamentsTotalCost.toFixed(2)),
+                            costo_accessori: Number(this.accessoriesTotalCost.toFixed(2)),
+                            costo_manodopera: Number(this.laborTotalCost.toFixed(2)),
+                            costo_ammortamento: Number(this.ammortamentoCost.toFixed(2)),
+                            costo_totale: Number(this.totalProductionCost.toFixed(2)),
+                            prezzo_vendita: Number(this.sellingPrice.toFixed(2)),
+                            numero_stampe: 1,
+                            guadagno_totale: Number(this.profit.toFixed(2)),
+                            dettaglio_filamenti: JSON.stringify(this.calc.usedFilaments.map(f => ({
+                                marca: f.brand,
+                                tipo: f.type,
+                                colore: f.color || 'N/D',
+                                grammi: Number(f.gramsUsed) || 0,
+                                costo: Number((Number(f.pricePerGram) * (Number(f.gramsUsed) || 0)).toFixed(2))
+                            }))),
+                            dettaglio_accessori: JSON.stringify(this.calc.usedAccessories.map(a => ({
+                                name: a.name,
+                                price: Number(a.price) || 0,
+                                qty: Number(a.qty) || 0
+                            })))
+                        };
+
+                        await fetch(this.cloudUrl, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                action: 'save_history',
+                                history_item: historyItem
+                            })
+                        });
+
+                        // Reset completo del modulo di calcolo
+                        const currentEnergyPrice = this.calc.energyPrice;
+                        const currentLaborPrice = this.calc.laborPrice;
+                        this.calc = {
+                            name: '',
+                            printerId: '',
+                            hours: '',
+                            minutes: '',
+                            laborHours: '',
+                            laborMinutes: '',
+                            usedFilaments: [],
+                            usedAccessories: [],
+                            iva: '',
+                            markup: '',
+                            energyPrice: currentEnergyPrice,
+                            laborPrice: currentLaborPrice
+                        };
+                        
+                        // Ricarica lo storico
+                        await this.loadFromCloud();
+                        alert('Salvataggio completato!');
+                        this.activeScreen = 3; // Vai alla schermata storico
+                    } catch (err) {
+                        console.error(err);
+                        alert('Errore durante il salvataggio dello storico.');
+                    } finally {
+                        this.syncing = false;
+                    }
+                },
+
+                saveLocal() {
+                    const data = {
+                        printers: this.printers,
+                        filaments: this.filaments,
+                        energyPrice: this.calc.energyPrice
+                    };
+                    localStorage.setItem('3d_costo_local_data', JSON.stringify(data));
+                },
+
+                get selectedPrinter() {
+                    return this.printers.find(p => String(p.id) === String(this.calc.printerId));
+                },
+
+                addPrinter() {
+                    const newId = this.printers.length > 0 ? Math.max(...this.printers.map(p => Number(p.id) || 0)) + 1 : 1;
+                    this.printers.push({
+                        id: newId,
+                        marca: '',
+                        modello: '',
+                        consumo_wh: '',
+                        data_acquisto: '',
+                        prezzo_acquisto: '',
+                        ammortamento_ora: ''
+                    });
+                    this.debouncedSave();
+                },
+
+                removePrinter(index) {
+                    this.printers.splice(index, 1);
+                    this.debouncedSave();
+                },
+
+                addFilamentToInventory() {
+                    const newId = this.filaments.length > 0 ? Math.max(...this.filaments.map(f => Number(f.id) || 0)) + 1 : 1;
+                    this.filaments.unshift({
+                        id: newId,
+                        marca: '',
+                        tipo: '',
+                        colore: '',
+                        prezzo_kg: ''
+                    });
+                    this.debouncedSave();
+                },
+
+                sortFilaments() {
+                    this.filaments.sort((a, b) => {
+                        const marcaA = (a.marca || '').trim().toLowerCase();
+                        const marcaB = (b.marca || '').trim().toLowerCase();
+                        if (marcaA < marcaB) return -1;
+                        if (marcaA > marcaB) return 1;
+
+                        const tipoA = (a.tipo || '').trim().toLowerCase();
+                        const tipoB = (b.tipo || '').trim().toLowerCase();
+                        if (tipoA < tipoB) return -1;
+                        if (tipoA > tipoB) return 1;
+
+                        const coloreA = (a.colore || '').trim().toLowerCase();
+                        const coloreB = (b.colore || '').trim().toLowerCase();
+                        if (coloreA < coloreB) return -1;
+                        if (coloreB < coloreA) return 1;
+
+                        return 0;
+                    });
+                },
+
+                removeFilamentFromInventory(index) {
+                    this.filaments.splice(index, 1);
+                    this.saveLocal();
+                    this.saveToCloud(); // Salvataggio immediato dopo eliminazione
+                },
+
+                get uniqueBrands() {
+                    const brands = this.filaments.map(f => (f.marca || '').trim()).filter(b => b);
+                    return [...new Set(brands)].sort();
+                },
+
+                getFilteredTypes(brand) {
+                    if (!brand) return [];
+                    const types = this.filaments
+                        .filter(f => (f.marca || '').trim() === brand.trim())
+                        .map(f => (f.tipo || '').trim())
+                        .filter(t => t);
+                    return [...new Set(types)].sort();
+                },
+
+                getFilteredColors(brand, type) {
+                    if (!brand || !type) return [];
+                    const colors = this.filaments
+                        .filter(f => 
+                            (f.marca || '').trim() === brand.trim() && 
+                            (f.tipo || '').trim() === type.trim()
+                        )
+                        .map(f => (f.colore || '').trim())
+                        .filter(c => c);
+                    return [...new Set(colors)].sort();
+                },
+
+                addFilament() {
+                    this.calc.usedFilaments.push({
+                        brand: '',
+                        type: '',
+                        color: '',
+                        gramsUsed: '',
+                        pricePerGram: '0.000'
+                    });
+                },
+
+                removeFilament(index) {
+                    this.calc.usedFilaments.splice(index, 1);
+                },
+
+                updateFilamentBrand(index) {
+                    this.calc.usedFilaments[index].type = '';
+                    this.calc.usedFilaments[index].color = '';
+                    this.calc.usedFilaments[index].pricePerGram = '0.000';
+                },
+
+                updateFilamentType(index) {
+                    this.calc.usedFilaments[index].color = '';
+                    this.calc.usedFilaments[index].pricePerGram = '0.000';
+                },
+
+                updateFilamentColor(index) {
+                    const uf = this.calc.usedFilaments[index];
+                    const fil = this.filaments.find(f => 
+                        (f.marca || '').trim() === (uf.brand || '').trim() &&
+                        (f.tipo || '').trim() === (uf.type || '').trim() &&
+                        (f.colore || '').trim() === (uf.color || '').trim()
+                    );
+                    if (fil) {
+                        const priceRaw = (Number(fil.prezzo_kg) || 0) / 1000;
+                        uf.pricePerGram = (Math.ceil(priceRaw * 1000) / 1000).toFixed(3);
+                    } else {
+                        uf.pricePerGram = '0.000';
+                    }
+                },
+
+                addAccessory() {
+                    this.calc.usedAccessories.push({
+                        name: '',
+                        price: '',
+                        qty: ''
+                    });
+                },
+
+                removeAccessory(index) {
+                    this.calc.usedAccessories.splice(index, 1);
+                },
+
+                updateHistoryQuantity(item) {
+                    if (!this.cloudUrl || this.syncing) return;
+                    this.syncing = true;
+                    
+                    const newQty = parseInt(item.numero_stampe) || 1;
+                    
+                    fetch(this.cloudUrl, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'update_history_qty',
+                            id_storico: item.id_storico,
+                            numero_stampe: newQty
+                        })
+                    })
+                    .then(() => {
+                        this.loadFromCloud();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Errore durante l\'aggiornamento della quantità.');
+                    })
+                    .finally(() => this.syncing = false);
+                },
+
+                formatEuro(val) {
+                    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 }).format(val || 0);
+                },
+
+                get energyCost() {
+                    if (!this.selectedPrinter || (!this.calc.hours && !this.calc.minutes)) return 0;
+                    const totalHours = (Number(this.calc.hours) || 0) + (Number(this.calc.minutes) || 0) / 60;
+                    const kWh = (Number(this.selectedPrinter.consumo_wh) / 1000) * totalHours;
+                    return kWh * Number(this.calc.energyPrice);
+                },
+
+                get ammortamentoCost() {
+                    if (!this.selectedPrinter || (!this.calc.hours && !this.calc.minutes)) return 0;
+                    const totalHours = (Number(this.calc.hours) || 0) + (Number(this.calc.minutes) || 0) / 60;
+                    return totalHours * Number(this.selectedPrinter.ammortamento_ora || 0);
+                },
+
+                get laborTotalCost() {
+                    if (!this.calc.laborHours && !this.calc.laborMinutes) return 0;
+                    const totalHours = (Number(this.calc.laborHours) || 0) + (Number(this.calc.laborMinutes) || 0) / 60;
+                    return totalHours * Number(this.calc.laborPrice);
+                },
+
+                get filamentsTotalCost() {
+                    return this.calc.usedFilaments.reduce((acc, f) => {
+                        return acc + (Number(f.pricePerGram) * (Number(f.gramsUsed) || 0));
+                    }, 0);
+                },
+
+                get accessoriesTotalCost() {
+                    return this.calc.usedAccessories.reduce((acc, a) => {
+                        return acc + ((Number(a.price) || 0) * (Number(a.qty) || 0));
+                    }, 0);
+                },
+
+                get totalProductionCost() {
+                    return this.energyCost + this.ammortamentoCost + this.filamentsTotalCost + this.accessoriesTotalCost + this.laborTotalCost;
+                },
+
+                get sellingPrice() {
+                    const cost = this.totalProductionCost;
+                    const markup = Number(this.calc.markup) || 0;
+                    const iva = Number(this.calc.iva) || 0;
+                    
+                    const priceWithMarkup = cost * (1 + markup / 100);
+                    const finalPrice = priceWithMarkup * (1 + iva / 100);
+                    return finalPrice;
+                },
+
+                get profit() {
+                    const cost = this.totalProductionCost;
+                    const markup = Number(this.calc.markup) || 0;
+                    
+                    const priceWithMarkup = cost * (1 + markup / 100);
+                    return priceWithMarkup - cost;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
