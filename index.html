@@ -182,9 +182,9 @@
                                 <i class="fas fa-times text-[10px]"></i>
                             </button>
                             
-                            <div class="grid grid-cols-3 sm:flex sm:items-end gap-x-1.5 gap-y-2 sm:gap-2">
+                            <div class="grid grid-cols-12 sm:flex sm:items-end gap-x-1.5 gap-y-2 sm:gap-2">
                                 <!-- Marca -->
-                                <div class="col-span-1 sm:w-24">
+                                <div class="col-span-3 sm:w-24">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 truncate">Marca</label>
                                     <select x-model="f.brand" @change="updateFilamentBrand(index)"
                                             class="w-full border-slate-200 rounded-xl shadow-sm p-1.5 border text-[10px] font-bold bg-white">
@@ -196,7 +196,7 @@
                                 </div>
 
                                 <!-- Tipo -->
-                                <div class="col-span-1 sm:w-28">
+                                <div class="col-span-3 sm:w-28">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 truncate">Tipo</label>
                                     <select x-model="f.type" @change="updateFilamentType(index)" :disabled="!f.brand"
                                             class="w-full border-slate-200 rounded-xl shadow-sm p-1.5 border text-[10px] font-bold bg-white disabled:bg-slate-100 disabled:text-slate-300">
@@ -208,7 +208,7 @@
                                 </div>
 
                                 <!-- Colore -->
-                                <div class="col-span-1 sm:flex-1">
+                                <div class="col-span-6 sm:flex-1">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 truncate">Colore</label>
                                     <select x-model="f.color" @change="updateFilamentColor(index)" :disabled="!f.type"
                                             class="w-full border-slate-200 rounded-xl shadow-sm p-1.5 border text-[10px] font-bold bg-white disabled:bg-slate-100 disabled:text-slate-300">
@@ -220,14 +220,14 @@
                                 </div>
 
                                 <!-- €/g -->
-                                <div class="col-span-1 sm:w-14">
+                                <div class="col-span-4 sm:w-14">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 text-center truncate">€/g</label>
                                     <input type="text" :value="f.pricePerGram" disabled
                                            class="w-full bg-slate-100 border-slate-200 rounded-xl shadow-sm p-1.5 border text-[10px] text-center font-bold text-slate-500">
                                 </div>
 
                                 <!-- Grammi -->
-                                <div class="col-span-1 sm:w-14">
+                                <div class="col-span-4 sm:w-14">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 text-center truncate">Gr.</label>
                                     <input type="text" x-model="f.gramsUsed" placeholder="0"
                                            inputmode="decimal"
@@ -236,7 +236,7 @@
                                 </div>
 
                                 <!-- Totale -->
-                                <div class="col-span-1 sm:w-16 text-right">
+                                <div class="col-span-4 sm:w-16 text-right">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 text-right truncate">Tot.</label>
                                     <div class="p-1.5 text-[10px] font-black text-blue-600 bg-blue-50/50 rounded-xl border border-blue-100/50 text-center truncate" 
                                          x-text="formatEuro(f.pricePerGram * (f.gramsUsed || 0))"></div>
@@ -564,29 +564,29 @@
                                 <i class="fas fa-trash-alt text-[10px]"></i>
                             </button>
                             
-                            <div class="grid grid-cols-2 sm:flex sm:items-end gap-3">
-                                <div class="col-span-1 sm:w-28">
+                            <div class="grid grid-cols-12 sm:flex sm:items-end gap-x-1.5 gap-y-2 sm:gap-3">
+                                <div class="col-span-6 sm:w-28">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1">Marca</label>
                                     <input type="text" x-model="fil.marca" placeholder="es. Sunlu" 
                                            @input="debouncedSave()" @change="saveToCloud()"
                                            class="w-full border-slate-200 rounded-xl shadow-sm p-2 border text-[11px] font-bold text-slate-700 bg-white">
                                 </div>
 
-                                <div class="col-span-1 sm:w-24">
+                                <div class="col-span-6 sm:w-24">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1">Tipo</label>
                                     <input type="text" x-model="fil.tipo" placeholder="es. PLA" 
                                            @input="debouncedSave()" @change="saveToCloud()"
                                            class="w-full border-slate-200 rounded-xl shadow-sm p-2 border text-[11px] font-bold text-slate-700 bg-white">
                                 </div>
 
-                                <div class="col-span-1 sm:flex-1">
+                                <div class="col-span-6 sm:flex-1">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1">Colore</label>
                                     <input type="text" x-model="fil.colore" placeholder="es. Nero" 
                                            @input="debouncedSave()" @change="saveToCloud()"
                                            class="w-full border-slate-200 rounded-xl shadow-sm p-2 border text-[11px] font-bold text-slate-700 bg-white">
                                 </div>
 
-                                <div class="col-span-1 sm:w-16">
+                                <div class="col-span-3 sm:w-16">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 text-center">€/kg</label>
                                     <input type="text" x-model="fil.prezzo_kg" placeholder="0.00"
                                            inputmode="decimal"
@@ -596,7 +596,7 @@
                                            class="w-full border-slate-200 rounded-xl shadow-sm p-2 border text-[11px] text-center font-bold text-slate-700 bg-white">
                                 </div>
 
-                                <div class="col-span-1 sm:w-16">
+                                <div class="col-span-3 sm:w-16">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 text-center">€/g</label>
                                     <div class="w-full bg-slate-100 border-slate-200 rounded-xl shadow-sm p-2 border text-[11px] text-center font-mono text-blue-600 font-bold"
                                          x-text="(Math.ceil((fil.prezzo_kg / 1000) * 1000) / 1000).toFixed(3)">
