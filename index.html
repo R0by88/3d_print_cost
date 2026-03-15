@@ -185,7 +185,7 @@
                             
                             <div class="grid grid-cols-12 sm:flex sm:items-end gap-x-1.5 gap-y-2 sm:gap-2">
                                 <!-- Marca -->
-                                <div class="col-span-3 sm:w-24">
+                                <div class="col-span-6 sm:w-24">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 truncate">Marca</label>
                                     <select x-model="f.brand" @change="updateFilamentBrand(index)"
                                             class="w-full border-slate-200 rounded-xl shadow-sm p-1.5 border text-[10px] font-bold bg-white">
@@ -197,7 +197,7 @@
                                 </div>
 
                                 <!-- Tipo -->
-                                <div class="col-span-3 sm:w-28">
+                                <div class="col-span-6 sm:w-28">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 truncate">Tipo</label>
                                     <select x-model="f.type" @change="updateFilamentType(index)" :disabled="!f.brand"
                                             class="w-full border-slate-200 rounded-xl shadow-sm p-1.5 border text-[10px] font-bold bg-white disabled:bg-slate-100 disabled:text-slate-300">
@@ -209,7 +209,7 @@
                                 </div>
 
                                 <!-- Colore -->
-                                <div class="col-span-6 sm:flex-1">
+                                <div class="col-span-12 sm:flex-1">
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 truncate">Colore</label>
                                     <select x-model="f.color" @change="updateFilamentColor(index)" :disabled="!f.type"
                                             class="w-full border-slate-200 rounded-xl shadow-sm p-1.5 border text-[10px] font-bold bg-white disabled:bg-slate-100 disabled:text-slate-300">
@@ -280,7 +280,8 @@
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 truncate">Prezzo (€)</label>
                                     <input type="text" x-model="acc.price" placeholder="0.00"
                                            inputmode="decimal"
-                                           @input="acc.price = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').slice(0, 6)"
+                                           @input="acc.price = sanitizeInput($event.target.value)"
+                                           @blur="formatInput(acc, 'price')"
                                            class="w-full border-slate-200 rounded-xl shadow-sm p-1.5 border text-[10px] font-black text-center text-slate-700 bg-white">
                                 </div>
 
@@ -355,27 +356,27 @@
 
                 <div class="grid grid-cols-2 gap-3 mb-4">
                     <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                        <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">IVA (%)</label>
-                        <div class="flex items-center">
-                            <input type="text" x-model="calc.iva" placeholder="0"
-                                   inputmode="decimal"
-                                   @input="calc.iva = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
-                                   @blur="formatInput(calc, 'iva')"
-                                   class="w-full bg-transparent border-none focus:ring-0 p-0 text-base font-black text-slate-700">
-                            <span class="text-slate-300 font-black text-sm">%</span>
+                            <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">IVA (%)</label>
+                            <div class="flex items-center">
+                                <input type="text" x-model="calc.iva" placeholder="0"
+                                       inputmode="decimal"
+                                       @input="calc.iva = sanitizeInput($event.target.value)"
+                                       @blur="formatInput(calc, 'iva')"
+                                       class="w-full bg-transparent border-none focus:ring-0 p-0 text-base font-black text-slate-700">
+                                <span class="text-slate-300 font-black text-sm">%</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                        <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Rincaro (%)</label>
-                        <div class="flex items-center">
-                            <input type="text" x-model="calc.markup" placeholder="0"
-                                   inputmode="decimal"
-                                   @input="calc.markup = $event.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
-                                   @blur="formatInput(calc, 'markup')"
-                                   class="w-full bg-transparent border-none focus:ring-0 p-0 text-base font-black text-slate-700">
-                            <span class="text-slate-300 font-black text-sm">%</span>
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                            <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Rincaro (%)</label>
+                            <div class="flex items-center">
+                                <input type="text" x-model="calc.markup" placeholder="0"
+                                       inputmode="decimal"
+                                       @input="calc.markup = sanitizeInput($event.target.value)"
+                                       @blur="formatInput(calc, 'markup')"
+                                       class="w-full bg-transparent border-none focus:ring-0 p-0 text-base font-black text-slate-700">
+                                <span class="text-slate-300 font-black text-sm">%</span>
+                            </div>
                         </div>
-                    </div>
                 </div>
 
                 <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
@@ -402,15 +403,15 @@
                     
                     <div class="space-y-2 pt-3 border-t border-white/10">
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-emerald-100 font-bold uppercase tracking-wide">Su costi sostenuti</span>
-                            <span class="text-xs font-black text-white" x-text="formatEuro(profitOnCosts)"></span>
+                            <span class="text-[10px] text-emerald-100 font-bold uppercase tracking-wide">quota costi di produzione (filamento, energia, accessori)</span>
+                            <span class="text-xs font-black text-white" x-text="formatEuro(profitMarkup)"></span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-emerald-100 font-bold uppercase tracking-wide">Recupero Ammortamento</span>
+                            <span class="text-[10px] text-emerald-100 font-bold uppercase tracking-wide">quota ammortamento stampante</span>
                             <span class="text-xs font-black text-white" x-text="formatEuro(profitAmmortamento)"></span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-emerald-100 font-bold uppercase tracking-wide">Ritorno Manodopera</span>
+                            <span class="text-[10px] text-emerald-100 font-bold uppercase tracking-wide">quota manodopera</span>
                             <span class="text-xs font-black text-white" x-text="formatEuro(profitLabor)"></span>
                         </div>
                     </div>
@@ -488,7 +489,7 @@
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 text-center">Prezzo (€)</label>
                                     <input type="text" x-model="p.prezzo_acquisto" placeholder="0"
                                            inputmode="decimal"
-                                           @input="p.prezzo_acquisto = $event.target.value.replace(/[^0-9.,]/g, '').replace(/(,,*),/g, '$1').replace(/(\..*)\./g, '$1'); debouncedSave()"
+                                           @input="p.prezzo_acquisto = sanitizeInput($event.target.value); debouncedSave()"
                                            @blur="formatInput(p, 'prezzo_acquisto')"
                                            class="w-full border-slate-200 rounded-xl shadow-sm p-2 border text-[11px] font-black text-center text-slate-700 bg-white">
                                 </div>
@@ -497,7 +498,7 @@
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 text-center">Amm. €/h</label>
                                     <input type="text" x-model="p.ammortamento_ora" placeholder="0.00"
                                              inputmode="decimal"
-                                             @input="p.ammortamento_ora = $event.target.value.replace(/[^0-9.,]/g, '').replace(/(,,*),/g, '$1').replace(/(\..*)\./g, '$1'); debouncedSave()"
+                                             @input="p.ammortamento_ora = sanitizeInput($event.target.value); debouncedSave()"
                                              @blur="formatInput(p, 'ammortamento_ora')"
                                              class="w-full border-slate-200 rounded-xl shadow-sm p-2 border text-[11px] font-black text-center text-slate-700 bg-white">
                                 </div>
@@ -594,7 +595,7 @@
                                     <label class="block text-[8px] font-black text-slate-400 uppercase mb-1 ml-1 text-center">€/kg</label>
                                     <input type="text" x-model="fil.prezzo_kg" placeholder="0.00"
                                            inputmode="decimal"
-                                           @input="fil.prezzo_kg = $event.target.value.replace(/[^0-9.,]/g, '').replace(/(,,*),/g, '$1').replace(/(\..*)\./g, '$1'); debouncedSave()"
+                                           @input="fil.prezzo_kg = sanitizeInput($event.target.value); debouncedSave()"
                                            @blur="formatInput(fil, 'prezzo_kg')"
                                            @change="saveToCloud()"
                                            class="w-full border-slate-200 rounded-xl shadow-sm p-2 border text-[11px] text-center font-bold text-slate-700 bg-white">
@@ -656,10 +657,6 @@
                                         <span x-text="`${h.numero_stampe} pz.`"></span>
                                     </span>
                                 </div>
-                            </div>
-                            <div class="text-right ml-4">
-                                <div class="text-lg font-black text-emerald-600 tracking-tighter" x-text="formatEuro(h.guadagno_totale)"></div>
-                                <div class="text-[8px] font-black text-slate-300 uppercase tracking-widest mt-0.5">Guadagno Netto</div>
                             </div>
                         </div>
                     </div>
@@ -772,7 +769,7 @@
                         <div class="bg-white rounded-[2rem] border border-slate-200/60 card-shadow overflow-hidden">
                             <div class="p-5 bg-emerald-50/50">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Guadagno Netto</span>
+                                    <span class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Guadagno Totale</span>
                                     <div class="text-right">
                                         <div class="text-2xl font-black text-emerald-600 tracking-tighter" x-text="formatEuro(selectedItem.guadagno_totale)"></div>
                                         <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest" x-text="`SU ${selectedItem.numero_stampe} UNITÀ`"></div>
@@ -783,15 +780,15 @@
                             <!-- Dettaglio Proporzionale -->
                             <div class="p-5 space-y-2 bg-white">
                                 <div class="flex justify-between items-center text-[10px]">
-                                    <span class="text-slate-500 font-bold uppercase tracking-wide">Margine su costi</span>
+                                    <span class="text-slate-500 font-bold uppercase tracking-wide">quota costi di produzione (filamento, energia, accessori)</span>
                                     <span class="font-black text-slate-700" x-text="formatEuro(selectedItem.guadagno_totale - (selectedItem.costo_ammortamento * selectedItem.numero_stampe) - (selectedItem.costo_manodopera * selectedItem.numero_stampe))"></span>
                                 </div>
                                 <div class="flex justify-between items-center text-[10px]">
-                                    <span class="text-slate-500 font-bold uppercase tracking-wide">Ammortamento</span>
+                                    <span class="text-slate-500 font-bold uppercase tracking-wide">quota ammortamento stampante</span>
                                     <span class="font-black text-slate-700" x-text="formatEuro(selectedItem.costo_ammortamento * selectedItem.numero_stampe)"></span>
                                 </div>
                                 <div class="flex justify-between items-center text-[10px]">
-                                    <span class="text-slate-500 font-bold uppercase tracking-wide">Manodopera</span>
+                                    <span class="text-slate-500 font-bold uppercase tracking-wide">quota manodopera</span>
                                     <span class="font-black text-slate-700" x-text="formatEuro(selectedItem.costo_manodopera * selectedItem.numero_stampe)"></span>
                                 </div>
                             </div>
@@ -897,7 +894,7 @@
                             <span class="absolute left-2.5 top-2.5 text-[10px] font-black text-blue-500">€</span>
                             <input type="text" x-model="calc.energyPrice" placeholder="0.00"
                                    inputmode="decimal"
-                                   @input="calc.energyPrice = $event.target.value.replace(/[^0-9.,]/g, '').replace(/(,,*),/g, '$1').replace(/(\..*)\./g, '$1'); debouncedSave()"
+                                   @input="calc.energyPrice = sanitizeInput($event.target.value); debouncedSave()"
                                    @blur="formatInput(calc, 'energyPrice')"
                                    class="w-full border-slate-200 rounded-xl shadow-sm p-2 pl-6 border text-[11px] text-right font-black text-slate-700">
                         </div>
@@ -912,7 +909,7 @@
                             <span class="absolute left-2.5 top-2.5 text-[10px] font-black text-blue-500">€</span>
                             <input type="text" x-model="calc.laborPrice" placeholder="0.00"
                                    inputmode="decimal"
-                                   @input="calc.laborPrice = $event.target.value.replace(/[^0-9.,]/g, '').replace(/(,,*),/g, '$1').replace(/(\..*)\./g, '$1'); debouncedSave()"
+                                   @input="calc.laborPrice = sanitizeInput($event.target.value); debouncedSave()"
                                    @blur="formatInput(calc, 'laborPrice')"
                                    class="w-full border-slate-200 rounded-xl shadow-sm p-2 pl-6 border text-[11px] text-right font-black text-slate-700">
                         </div>
@@ -1039,12 +1036,24 @@
                     manualPrice: '0.00'
                 },
                 
+                // Funzione per pulire input numerici durante la digitazione
+                sanitizeInput(val) {
+                    if (val === undefined || val === null || val === '') return '';
+                    let s = String(val).replace(',', '.');
+                    // Rimuove tutto tranne numeri e un solo punto
+                    s = s.replace(/[^0-9.]/g, '');
+                    const parts = s.split('.');
+                    if (parts.length > 2) {
+                        s = parts[0] + '.' + parts.slice(1).join('');
+                    }
+                    return s;
+                },
+
                 // Funzione per formattare input monetari
                 formatInput(obj, key) {
                     let val = obj[key];
                     if (val === undefined || val === null || val === '') return;
                     
-                    // Converti in stringa e pulisci
                     let s = String(val).replace(',', '.');
                     let n = parseFloat(s);
                     
@@ -1206,7 +1215,19 @@
                     if (!this.cloudUrl || (this.syncing && isManual)) return;
                     
                     this.syncing = true;
-                    this.sortFilaments();
+                    
+                    // Ordina solo se tutti i filamenti hanno i campi principali compilati
+                    // Evita che i filamenti "saltino" mentre l'utente li sta inserendo
+                    const allComplete = this.filaments.every(f => 
+                        (f.marca || '').trim() !== '' && 
+                        (f.tipo || '').trim() !== '' && 
+                        (f.colore || '').trim() !== '' && 
+                        (f.prezzo_kg !== undefined && f.prezzo_kg !== null && f.prezzo_kg !== '' && Number(f.prezzo_kg) > 0)
+                    );
+
+                    if (allComplete) {
+                        this.sortFilaments();
+                    }
 
                     // Funzione di pulizia numerica per l'invio
                     const clean = (val) => {
@@ -1503,7 +1524,7 @@
                     // Calcoliamo subito il nuovo guadagno per l'interfaccia
                     const sellPriceNet = (Number(item.prezzo_vendita) || 0) / (1 + (Number(item.iva_applicata) || 0) / 100);
                     const varCosts = (Number(item.costo_totale) || 0) - (Number(item.costo_ammortamento) || 0) - (Number(item.costo_manodopera) || 0);
-                    const unitGain = sellPriceNet - varCosts;
+                    const unitGain = sellPriceNet - varCosts; // markup + labor + amortization
                     item.guadagno_totale = Number((unitGain * newQty).toFixed(2));
                     // ----------------------------------------------------
 
@@ -1536,6 +1557,7 @@
                 },
 
                 updateMarkupFromPrice() {
+                    this.calc.manualPrice = this.sanitizeInput(this.calc.manualPrice);
                     const p = parseFloat(this.calc.manualPrice) || 0;
                     const iva = Number(this.calc.iva) || 0;
                     const costToMarkup = this.energyCost + this.filamentsTotalCost + this.accessoriesTotalCost;
@@ -1614,7 +1636,7 @@
                     return finalPrice;
                 },
 
-                get profitOnCosts() {
+                get profitMarkup() {
                     const markup = Number(this.calc.markup) || 0;
                     const costs = this.energyCost + this.filamentsTotalCost + this.accessoriesTotalCost;
                     return costs * (markup / 100);
@@ -1629,7 +1651,8 @@
                 },
 
                 get profit() {
-                    return this.profitOnCosts + this.profitAmmortamento + this.profitLabor;
+                    // Guadagno Totale = Ricarico + Ammortamento + Manodopera
+                    return this.profitMarkup + this.profitAmmortamento + this.profitLabor;
                 }
             }
         }
