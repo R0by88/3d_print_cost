@@ -286,12 +286,31 @@
 
                 <div class="mt-6 space-y-3 p-4 bg-blue-50 rounded-lg">
                     <div class="flex justify-between items-center">
-                        <span class="font-semibold">Prezzo di Vendita</span>
-                        <span class="text-xl font-bold text-blue-700" x-text="formatEuro(sellingPrice)"></span>
+                        <span class="font-bold text-gray-700">Prezzo di Vendita</span>
+                        <div class="flex items-center bg-white rounded-md border border-blue-200 px-2 shadow-inner">
+                            <span class="text-2xl font-black text-blue-700 mr-1">€</span>
+                            <input type="text" x-model="calc.manualPrice" 
+                                   @input="updateMarkupFromPrice()"
+                                   class="text-2xl font-black text-blue-700 w-32 bg-transparent border-none focus:ring-0 text-right p-0">
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center text-green-600">
-                        <span class="font-semibold">Guadagno (al netto IVA)</span>
-                        <span class="text-lg font-bold" x-text="formatEuro(profit)"></span>
+                    <div class="flex justify-between items-center text-green-600 border-t border-blue-100 pt-3">
+                        <span class="font-bold">Guadagno Netto</span>
+                        <span class="text-2xl font-black" x-text="formatEuro(profit)"></span>
+                    </div>
+                    <div class="pl-2 space-y-1 border-l-2 border-green-200 ml-1">
+                        <div class="flex justify-between text-[11px] text-green-600 font-medium italic">
+                            <span>Guadagno su costi sostenuti (Mat+En+Acc)</span>
+                            <span x-text="formatEuro(profitOnCosts)"></span>
+                        </div>
+                        <div class="flex justify-between text-[11px] text-green-600 font-medium italic">
+                            <span>Guadagno per ammortamento stampante</span>
+                            <span x-text="formatEuro(profitAmmortamento)"></span>
+                        </div>
+                        <div class="flex justify-between text-[11px] text-green-600 font-medium italic">
+                            <span>Guadagno per manodopera</span>
+                            <span x-text="formatEuro(profitLabor)"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -557,7 +576,7 @@
                             <div class="flex justify-between items-center border-t pt-2">
                                 <span class="text-green-700 font-bold">Guadagno Totale</span>
                                 <div class="text-right">
-                                    <div class="text-2xl font-black text-green-600" x-text="formatEuro((selectedItem.prezzo_vendita - selectedItem.costo_totale) * selectedItem.numero_stampe)"></div>
+                                    <div class="text-2xl font-black text-green-600" x-text="formatEuro(selectedItem.guadagno_totale * selectedItem.numero_stampe)"></div>
                                     <div class="text-[10px] text-gray-400" x-text="`Su ${selectedItem.numero_stampe} stampe`"></div>
                                 </div>
                             </div>
@@ -741,7 +760,8 @@
                     iva: '',
                     markup: '',
                     energyPrice: 0.25,
-                    laborPrice: 15.00
+                    laborPrice: 15.00,
+                    manualPrice: '0.00'
                 },
                 
                 // Stato Cloud
@@ -753,6 +773,11 @@
                     this.$watch('cloudUrl', value => {
                         localStorage.setItem('3d_costo_cloud_url', value);
                         if (value) this.loadFromCloud();
+                    });
+
+                    // Sincronizza manualPrice quando cambia sellingPrice
+                    this.$watch('sellingPrice', (value) => {
+                        this.calc.manualPrice = value.toFixed(2);
                     });
 
                     // Caricamento iniziale
@@ -1120,6 +1145,19 @@
                     .finally(() => this.syncing = false);
                 },
 
+                updateMarkupFromPrice() {
+                    const p = parseFloat(this.calc.manualPrice) || 0;
+                    const iva = Number(this.calc.iva) || 0;
+                    const costToMarkup = this.energyCost + this.filamentsTotalCost + this.accessoriesTotalCost;
+                    const costFixed = this.ammortamentoCost + this.laborTotalCost;
+                    
+                    if (costToMarkup > 0) {
+                        const priceNetIva = p / (1 + iva / 100);
+                        const m = ((priceNetIva - costFixed) / costToMarkup - 1) * 100;
+                        this.calc.markup = Math.max(0, m).toFixed(2);
+                    }
+                },
+
                 formatEuro(val) {
                     return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 }).format(val || 0);
                 },
@@ -1160,21 +1198,33 @@
                 },
 
                 get sellingPrice() {
-                    const cost = this.totalProductionCost;
                     const markup = Number(this.calc.markup) || 0;
                     const iva = Number(this.calc.iva) || 0;
                     
-                    const priceWithMarkup = cost * (1 + markup / 100);
+                    const costToMarkup = this.energyCost + this.filamentsTotalCost + this.accessoriesTotalCost;
+                    const costFixed = this.ammortamentoCost + this.laborTotalCost;
+                    
+                    const priceWithMarkup = (costToMarkup * (1 + markup / 100)) + costFixed;
                     const finalPrice = priceWithMarkup * (1 + iva / 100);
                     return finalPrice;
                 },
 
-                get profit() {
-                    const cost = this.totalProductionCost;
+                get profitOnCosts() {
                     const markup = Number(this.calc.markup) || 0;
-                    
-                    const priceWithMarkup = cost * (1 + markup / 100);
-                    return priceWithMarkup - cost;
+                    const costs = this.energyCost + this.filamentsTotalCost + this.accessoriesTotalCost;
+                    return costs * (markup / 100);
+                },
+
+                get profitAmmortamento() {
+                    return this.ammortamentoCost;
+                },
+
+                get profitLabor() {
+                    return this.laborTotalCost;
+                },
+
+                get profit() {
+                    return this.profitOnCosts + this.profitAmmortamento + this.profitLabor;
                 }
             }
         }
